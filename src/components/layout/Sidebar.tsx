@@ -21,7 +21,7 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { name: "Setting", path: "/settings", icon: Settings },
+  { name: "Settings", path: "/settings", icon: Settings },
   { name: "Dark mode", path: "", icon: Moon },
   { name: "Log out", path: "", icon: LogOut },
 ];
@@ -33,11 +33,11 @@ export function Sidebar() {
     <div className="h-screen w-[160px] bg-white border-r border-gray-200 flex flex-col justify-between py-6">
       <div className="space-y-8">
         <div className="px-4">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 bg-blue-500 text-white flex items-center justify-center rounded">
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="h-8 w-8 bg-blue-500 text-white flex items-center justify-center rounded transition-transform group-hover:scale-110">
               <span className="font-bold text-xl">V</span>
             </div>
-            <span className="font-semibold text-gray-900">Voyage Vista</span>
+            <span className="font-semibold text-gray-900 group-hover:text-blue-500 transition-colors">Voyage Vista</span>
           </Link>
         </div>
 
@@ -47,13 +47,13 @@ export function Sidebar() {
               key={item.name}
               to={item.path}
               className={cn(
-                "flex items-center space-x-3 px-4 py-2.5 w-full",
+                "flex items-center space-x-3 px-4 py-2.5 w-full transition-all",
                 location.pathname === item.path 
                   ? "bg-blue-50 text-blue-600 border-l-2 border-blue-600" 
-                  : "text-gray-500 hover:bg-gray-100"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
-              <item.icon size={20} />
+              <item.icon size={20} className="transition-transform group-hover:scale-110" />
               <span className="text-sm font-medium">{item.name}</span>
             </Link>
           ))}
@@ -65,7 +65,12 @@ export function Sidebar() {
           <Link
             key={item.name}
             to={item.path}
-            className="flex items-center space-x-3 px-4 py-2.5 text-gray-500 hover:bg-gray-100"
+            className={cn(
+              "flex items-center space-x-3 px-4 py-2.5 transition-all",
+              location.pathname === item.path 
+                ? "bg-blue-50 text-blue-600 border-l-2 border-blue-600" 
+                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            )}
           >
             <item.icon size={20} />
             <span className="text-sm font-medium">{item.name}</span>

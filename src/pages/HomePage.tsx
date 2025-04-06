@@ -5,6 +5,7 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RoomCard } from "@/components/rooms/RoomCard";
 import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
+import { BookingChart } from "@/components/dashboard/BookingChart";
 
 const popularRooms = [
   {
@@ -81,13 +82,17 @@ const HomePage = () => {
         />
       </div>
       
+      <div className="mb-8">
+        <BookingChart className="animate-fade-in" />
+      </div>
+      
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Popular Rooms</h2>
         <div className="flex gap-2">
-          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50">
+          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
             <ChevronLeft size={18} />
           </button>
-          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50">
+          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
             <ChevronRight size={18} />
           </button>
         </div>
