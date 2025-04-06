@@ -18,7 +18,7 @@ export function RoomCard({ image, title, location, price, className, onClick }: 
   return (
     <div 
       className={cn(
-        "bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300",
+        "bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm transition-all duration-300",
         isHovered ? "shadow-md transform translate-y-[-5px]" : "",
         className
       )}
@@ -39,8 +39,8 @@ export function RoomCard({ image, title, location, price, className, onClick }: 
         </div>
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500 mb-4">{location}</p>
+        <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{location}</p>
         <Button 
           className={cn(
             "w-full transition-all duration-300",

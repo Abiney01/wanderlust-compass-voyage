@@ -5,7 +5,6 @@ import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
 import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
-import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 
 // Expanded popular rooms data
 const popularRooms = [
@@ -78,8 +77,7 @@ const HomePage = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">Find Your Next Destination</h1>
-        <SearchSuggestions className="max-w-lg" />
+        <h1 className="text-2xl font-bold mb-4">Welcome to TravelEase</h1>
       </div>
       
       <div className="grid grid-cols-4 gap-6 mb-8">
