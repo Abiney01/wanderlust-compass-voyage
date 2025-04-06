@@ -1,12 +1,13 @@
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/Dashboard";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { RoomCard } from "@/components/rooms/RoomCard";
 import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
+import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
+import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 
+// Expanded popular rooms data
 const popularRooms = [
   {
     id: 1,
@@ -28,6 +29,27 @@ const popularRooms = [
     title: "Greecevillage",
     location: "Shimane Villa",
     price: 199
+  },
+  {
+    id: 4,
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427",
+    title: "Mountain View Suite",
+    location: "Alpine Retreat",
+    price: 299
+  },
+  {
+    id: 5,
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+    title: "Ocean Front Villa",
+    location: "Coastal Resort",
+    price: 399
+  },
+  {
+    id: 6,
+    image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461",
+    title: "Luxury Penthouse",
+    location: "Downtown Heights",
+    price: 499
   }
 ];
 
@@ -55,6 +77,11 @@ const scheduledTrips = [
 const HomePage = () => {
   return (
     <DashboardLayout>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-4">Find Your Next Destination</h1>
+        <SearchSuggestions className="max-w-lg" />
+      </div>
+      
       <div className="grid grid-cols-4 gap-6 mb-8">
         <StatsCard
           title="Total Sales"
@@ -86,29 +113,7 @@ const HomePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Popular Rooms - Taking 2/3 of the width */}
         <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Popular Rooms</h2>
-            <div className="flex gap-2">
-              <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
-                <ChevronLeft size={18} />
-              </button>
-              <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {popularRooms.map(room => (
-              <RoomCard
-                key={room.id}
-                image={room.image}
-                title={room.title}
-                location={room.location}
-                price={room.price}
-              />
-            ))}
-          </div>
+          <PopularRoomsCarousel rooms={popularRooms} />
         </div>
         
         {/* Calendar - Taking 1/3 of the width */}
