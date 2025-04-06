@@ -82,53 +82,60 @@ const HomePage = () => {
         />
       </div>
       
-      <div className="mb-8">
-        <BookingChart className="animate-fade-in" />
+      {/* Popular Rooms and Calendar Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Popular Rooms - Taking 2/3 of the width */}
+        <div className="lg:col-span-2">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Popular Rooms</h2>
+            <div className="flex gap-2">
+              <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
+                <ChevronLeft size={18} />
+              </button>
+              <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {popularRooms.map(room => (
+              <RoomCard
+                key={room.id}
+                image={room.image}
+                title={room.title}
+                location={room.location}
+                price={room.price}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Calendar - Taking 1/3 of the width */}
+        <div>
+          <Calendar />
+        </div>
       </div>
       
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Popular Rooms</h2>
-        <div className="flex gap-2">
-          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
-            <ChevronLeft size={18} />
-          </button>
-          <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-all transform hover:scale-105">
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {popularRooms.map(room => (
-          <RoomCard
-            key={room.id}
-            image={room.image}
-            title={room.title}
-            location={room.location}
-            price={room.price}
-          />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Booking Stats and My Schedule Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Booking Chart - Taking 2/3 of the width */}
         <div className="lg:col-span-2">
-          {/* Add other dashboard elements here */}
+          <BookingChart className="animate-fade-in" />
         </div>
-        <div className="space-y-6">
-          <Calendar />
-          
-          <div>
-            <h2 className="text-lg font-bold mb-4">My Schedule</h2>
-            <div className="space-y-3">
-              {scheduledTrips.map(trip => (
-                <TripCard
-                  key={trip.id}
-                  image={trip.image}
-                  title={trip.title}
-                  date={trip.date}
-                />
-              ))}
-            </div>
+        
+        {/* My Schedule - Taking 1/3 of the width */}
+        <div>
+          <h2 className="text-lg font-bold mb-4">My Schedule</h2>
+          <div className="space-y-3">
+            {scheduledTrips.map(trip => (
+              <TripCard
+                key={trip.id}
+                image={trip.image}
+                title={trip.title}
+                date={trip.date}
+              />
+            ))}
           </div>
         </div>
       </div>
