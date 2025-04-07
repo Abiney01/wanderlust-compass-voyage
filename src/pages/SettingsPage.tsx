@@ -1,308 +1,364 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/Dashboard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { User, Languages, Globe, IndianRupee } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { useTheme } from "@/components/theme/theme-provider";
-
-// Constants for language and currency options
-const LANGUAGES = [
-  { value: "english", label: "English" },
-  { value: "spanish", label: "Spanish" },
-  { value: "french", label: "French" },
-  { value: "german", label: "German" },
-  { value: "japanese", label: "Japanese" },
-  { value: "hindi", label: "Hindi" }
-];
-
-const CURRENCIES = [
-  { value: "usd", label: "USD ($)", symbol: "$" },
-  { value: "eur", label: "EUR (€)", symbol: "€" },
-  { value: "gbp", label: "GBP (£)", symbol: "£" },
-  { value: "jpy", label: "JPY (¥)", symbol: "¥" },
-  { value: "aud", label: "AUD ($)", symbol: "$" },
-  { value: "inr", label: "INR (₹)", symbol: "₹" }
-];
+import { useUserPreferences } from "@/context/UserPreferencesContext";
+import { Bell, Globe, CreditCard, Languages, Wallet } from "lucide-react";
 
 const SettingsPage = () => {
-  const { theme } = useTheme();
-
-  // User profile state
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [address, setAddress] = useState("123 Travel St, City");
-  const [image, setImage] = useState("/placeholder.svg");
+  const { currency, setCurrency, language, setLanguage } = useUserPreferences();
   
-  // Preferences state with local storage persistence
-  const [language, setLanguage] = useState(() => 
-    localStorage.getItem("user-language") || "english"
-  );
-  const [currency, setCurrency] = useState(() => 
-    localStorage.getItem("user-currency") || "usd"
-  );
-
-  // Save preferences to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem("user-language", language);
-    document.documentElement.setAttribute("lang", language.substring(0, 2));
-    toast.success(`Language updated to ${LANGUAGES.find(l => l.value === language)?.label || language}`);
-  }, [language]);
-
-  useEffect(() => {
-    localStorage.setItem("user-currency", currency);
-    toast.success(`Currency updated to ${CURRENCIES.find(c => c.value === currency)?.label || currency}`);
-    
-    // Apply currency format to any price elements
-    const applyCurrencyFormat = () => {
-      const selectedCurrency = CURRENCIES.find(c => c.value === currency);
-      document.documentElement.style.setProperty('--currency-symbol', `"${selectedCurrency?.symbol || '$'}"`);
-    };
-    
-    applyCurrencyFormat();
-  }, [currency]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setImage(e.target.result as string);
-          localStorage.setItem("user-image", e.target.result as string);
-          toast.success("Profile image updated successfully");
-        }
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  };
-
-  const handleNameChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem("user-name", name);
-    toast.success(`Name updated to ${name}`);
-  };
-
-  const handleAddressChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem("user-address", address);
-    toast.success(`Address updated to ${address}`);
-  };
+  const [profile, setProfile] = useState({
+    name: "Alex Johnson",
+    email: "alex@example.com",
+    phone: "+1 (555) 123-4567",
+    bio: "Travel enthusiast and adventure seeker. Love exploring new places and meeting new people."
+  });
   
-  // Load user data from localStorage on mount
-  useEffect(() => {
-    const storedName = localStorage.getItem("user-name");
-    const storedAddress = localStorage.getItem("user-address");
-    const storedImage = localStorage.getItem("user-image");
-    
-    if (storedName) setName(storedName);
-    if (storedAddress) setAddress(storedAddress);
-    if (storedImage) setImage(storedImage);
-  }, []);
+  const [notifications, setNotifications] = useState({
+    marketing: true,
+    socialUpdates: false,
+    securityAlerts: true,
+    promotionalOffers: true
+  });
+
+  const handleProfileUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Profile updated successfully");
+  };
+
+  const handleNotificationChange = (key: keyof typeof notifications) => {
+    setNotifications(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6 dark:text-white">Settings</h1>
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold dark:text-white">Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400">Manage your account settings and preferences</p>
+        </div>
         
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="mb-6 dark:bg-gray-700">
-            <TabsTrigger value="profile" className="flex items-center gap-2 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-white">
-              <User size={16} />
-              <span>Profile</span>
-            </TabsTrigger>
-            <TabsTrigger value="preferences" className="flex items-center gap-2 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-white">
-              <Languages size={16} />
-              <span>Preferences</span>
-            </TabsTrigger>
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList className="grid grid-cols-4 md:w-[600px] dark:bg-gray-800">
+            <TabsTrigger value="profile" className="dark:data-[state=active]:bg-gray-700">Profile</TabsTrigger>
+            <TabsTrigger value="preferences" className="dark:data-[state=active]:bg-gray-700">Preferences</TabsTrigger>
+            <TabsTrigger value="notifications" className="dark:data-[state=active]:bg-gray-700">Notifications</TabsTrigger>
+            <TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="profile" className="space-y-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm animate-fade-in dark:bg-gray-800">
-              <h2 className="text-lg font-semibold mb-4 dark:text-white">Profile Information</h2>
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="w-28 h-28">
-                    <AvatarImage src={image} alt={name} className="object-cover" />
-                    <AvatarFallback>{name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Input
-                      id="avatar"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                    <Label
-                      htmlFor="avatar"
-                      className="bg-blue-50 text-blue-600 px-4 py-2 rounded-md cursor-pointer hover:bg-blue-100 transition-colors dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
-                    >
-                      Change Avatar
-                    </Label>
-                  </div>
-                </div>
-                
-                <div className="flex-1 space-y-6 w-full">
-                  <form onSubmit={handleNameChange} className="space-y-4">
-                    <div>
-                      <Label htmlFor="name" className="dark:text-white">Full Name</Label>
-                      <Input
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="hover:border-blue-300 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                      />
-                    </div>
-                    <Button type="submit" className="hover:scale-105 transition-transform dark:bg-blue-700 dark:hover:bg-blue-800">
-                      Update Name
+          {/* Profile Tab */}
+          <TabsContent value="profile">
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="dark:text-white">Profile Information</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Update your personal details here
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <Avatar className="w-16 h-16">
+                      <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80" />
+                      <AvatarFallback>AJ</AvatarFallback>
+                    </Avatar>
+                    <Button variant="outline" className="dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                      Change Photo
                     </Button>
-                  </form>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="email" className="dark:text-white">Email Address</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        readOnly
-                        className="bg-gray-50 dark:bg-gray-600 dark:text-gray-300"
-                      />
-                      <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Email changes are not allowed for security reasons.</p>
-                    </div>
-                    
-                    <form onSubmit={handleAddressChange}>
-                      <div className="mb-4">
-                        <Label htmlFor="address" className="dark:text-white">Address</Label>
-                        <Input
-                          id="address"
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          className="hover:border-blue-300 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        />
-                      </div>
-                      <Button type="submit" className="hover:scale-105 transition-transform dark:bg-blue-700 dark:hover:bg-blue-800">
-                        Update Address
-                      </Button>
-                    </form>
                   </div>
-                </div>
-              </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name" className="dark:text-white">Name</Label>
+                      <Input 
+                        id="name" 
+                        value={profile.name} 
+                        onChange={(e) => setProfile({...profile, name: e.target.value})} 
+                        className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email" className="dark:text-white">Email</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        value={profile.email} 
+                        onChange={(e) => setProfile({...profile, email: e.target.value})} 
+                        className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone" className="dark:text-white">Phone Number</Label>
+                    <Input 
+                      id="phone" 
+                      value={profile.phone} 
+                      onChange={(e) => setProfile({...profile, phone: e.target.value})} 
+                      className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="bio" className="dark:text-white">Bio</Label>
+                    <Input 
+                      id="bio" 
+                      value={profile.bio} 
+                      onChange={(e) => setProfile({...profile, bio: e.target.value})} 
+                      className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                  </div>
+                  <Button type="submit">Save Changes</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Preferences Tab */}
+          <TabsContent value="preferences">
+            <div className="grid gap-6">
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center dark:text-white">
+                    <Globe className="mr-2 h-5 w-5" /> Language
+                  </CardTitle>
+                  <CardDescription className="dark:text-gray-400">
+                    Choose your preferred language
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RadioGroup value={language} className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {['English', 'Spanish', 'French', 'German', 'Hindi', 'Japanese'].map((lang) => (
+                      <div key={lang} className="flex items-center space-x-2">
+                        <RadioGroupItem 
+                          value={lang} 
+                          id={`lang-${lang}`} 
+                          onClick={() => setLanguage(lang as any)}
+                          className="dark:border-gray-500"
+                        />
+                        <Label htmlFor={`lang-${lang}`} className="dark:text-white">{lang}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+              
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center dark:text-white">
+                    <Wallet className="mr-2 h-5 w-5" /> Currency
+                  </CardTitle>
+                  <CardDescription className="dark:text-gray-400">
+                    Set your preferred currency for displaying prices
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RadioGroup value={currency} className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {[
+                      {code: 'USD', label: 'US Dollar ($)'},
+                      {code: 'EUR', label: 'Euro (€)'},
+                      {code: 'GBP', label: 'British Pound (£)'},
+                      {code: 'INR', label: 'Indian Rupee (₹)'},
+                      {code: 'JPY', label: 'Japanese Yen (¥)'},
+                      {code: 'AUD', label: 'Australian Dollar (A$)'}
+                    ].map((curr) => (
+                      <div key={curr.code} className="flex items-center space-x-2">
+                        <RadioGroupItem 
+                          value={curr.code} 
+                          id={`currency-${curr.code}`} 
+                          onClick={() => setCurrency(curr.code as any)}
+                          className="dark:border-gray-500"
+                        />
+                        <Label htmlFor={`currency-${curr.code}`} className="dark:text-white">{curr.label}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+              
+              <Card className="dark:bg-gray-800 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center dark:text-white">
+                    <CreditCard className="mr-2 h-5 w-5" /> Payment Methods
+                  </CardTitle>
+                  <CardDescription className="dark:text-gray-400">
+                    Manage your payment methods
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4 dark:border-gray-700">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-10 w-10 bg-gray-100 rounded flex items-center justify-center dark:bg-gray-700">
+                          <CreditCard className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium dark:text-white">Visa ending in 4242</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Expires 12/2025</p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-white">Edit</Button>
+                    </div>
+                    <Button className="w-full">Add New Payment Method</Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
           
-          <TabsContent value="preferences" className="space-y-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm animate-fade-in dark:bg-gray-800">
-              <h2 className="text-lg font-semibold mb-4 dark:text-white">Language & Region</h2>
-              <div className="grid md:grid-cols-2 gap-6">
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="flex items-center dark:text-white">
+                  <Bell className="mr-2 h-5 w-5" /> Notification Settings
+                </CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Configure how you want to be notified
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium dark:text-white">Marketing Emails</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive emails about new features and promotions</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.marketing} 
+                    onCheckedChange={() => handleNotificationChange('marketing')}
+                    className="dark:bg-gray-700"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium dark:text-white">Social Updates</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive notifications about your network</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.socialUpdates} 
+                    onCheckedChange={() => handleNotificationChange('socialUpdates')}
+                    className="dark:bg-gray-700"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium dark:text-white">Security Alerts</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Get notified about account security events</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.securityAlerts} 
+                    onCheckedChange={() => handleNotificationChange('securityAlerts')}
+                    className="dark:bg-gray-700"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium dark:text-white">Promotional Offers</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive special offers and discounts</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.promotionalOffers} 
+                    onCheckedChange={() => handleNotificationChange('promotionalOffers')}
+                    className="dark:bg-gray-700"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button onClick={() => toast.success("Notification preferences saved")}>Save Preferences</Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+          
+          {/* Security Tab */}
+          <TabsContent value="security">
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="dark:text-white">Security Settings</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Update your password and security preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="language" className="dark:text-white">Language</Label>
-                  <Select value={language} onValueChange={(val) => {
-                    setLanguage(val);
-                    // Apply language change effect
-                    document.querySelectorAll('h1, h2, h3, p, span, button').forEach(el => {
-                      el.classList.add('animate-pulse');
-                      setTimeout(() => el.classList.remove('animate-pulse'), 500);
-                    });
-                  }}>
-                    <SelectTrigger className="w-full dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                      {LANGUAGES.map(lang => (
-                        <SelectItem key={lang.value} value={lang.value} className="dark:hover:bg-gray-600">
-                          {lang.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    This will change the application language
-                  </p>
+                  <Label htmlFor="current-password" className="dark:text-white">Current Password</Label>
+                  <Input 
+                    id="current-password" 
+                    type="password" 
+                    placeholder="Enter your current password"
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="currency" className="dark:text-white">Currency</Label>
-                  <div className="relative">
-                    <Select value={currency} onValueChange={(val) => {
-                      setCurrency(val);
-                      // Apply currency change effect
-                      document.querySelectorAll('[data-currency]').forEach(el => {
-                        el.classList.add('animate-pulse');
-                        setTimeout(() => el.classList.remove('animate-pulse'), 500);
-                      });
-                    }}>
-                      <SelectTrigger className="w-full dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                        {CURRENCIES.map(curr => (
-                          <SelectItem key={curr.value} value={curr.value} className="dark:hover:bg-gray-600">
-                            <div className="flex items-center">
-                              {curr.value === 'inr' ? <IndianRupee size={14} className="mr-1" /> : null}
-                              {curr.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-                      <Globe size={16} className="text-gray-400" />
+                  <Label htmlFor="new-password" className="dark:text-white">New Password</Label>
+                  <Input 
+                    id="new-password" 
+                    type="password" 
+                    placeholder="Enter your new password"
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password" className="dark:text-white">Confirm New Password</Label>
+                  <Input 
+                    id="confirm-password" 
+                    type="password" 
+                    placeholder="Confirm your new password"
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  />
+                </div>
+                
+                <div className="pt-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="font-medium dark:text-white">Two-Factor Authentication</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security</p>
                     </div>
+                    <Switch 
+                      className="dark:bg-gray-700"
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          toast.success("Two-factor authentication enabled");
+                        } else {
+                          toast.error("Two-factor authentication disabled");
+                        }
+                      }} 
+                    />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    All prices will be displayed in this currency
-                  </p>
                 </div>
-              </div>
-              
-              <div className="mt-8">
-                <h3 className="text-md font-semibold mb-2 dark:text-white">Current Preferences</h3>
-                <div className="bg-gray-50 p-4 rounded-md dark:bg-gray-700">
-                  <p className="text-sm dark:text-gray-300">
-                    Language: <span className="font-medium">{LANGUAGES.find(l => l.value === language)?.label}</span>
-                  </p>
-                  <p className="text-sm dark:text-gray-300">
-                    Currency: <span className="font-medium">{CURRENCIES.find(c => c.value === currency)?.label}</span>
-                    {" "} 
-                    <span className="text-xs bg-gray-200 px-1.5 py-0.5 rounded-md dark:bg-gray-600" data-currency>
-                      Example: {CURRENCIES.find(c => c.value === currency)?.symbol}100
-                    </span>
-                  </p>
-                  <p className="text-sm mt-2 dark:text-gray-300">
-                    Theme: <span className="font-medium capitalize">{theme}</span>
-                  </p>
-                </div>
-              </div>
-              
-              <div className="mt-8 flex justify-end">
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  onClick={() => toast.success("Password updated successfully. Please log in again.")}
+                  className="mr-2"
+                >
+                  Update Password
+                </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => {
-                    setLanguage("english");
-                    setCurrency("usd");
-                    toast.info("Preferences have been reset to defaults");
-                  }}
-                  className="mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500 dark:border-gray-600"
+                  onClick={() => toast.error("This action would log you out and delete your account.")}
                 >
-                  Reset to defaults
+                  Delete Account
                 </Button>
-                <Button
-                  onClick={() => {
-                    toast.success("Your preferences have been applied");
-                  }}
-                  className="dark:bg-blue-700 dark:hover:bg-blue-800"
-                >
-                  Apply settings
-                </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -46,6 +46,16 @@ const popularDestinations = [
   }
 ];
 
+// Get all destination details including from search component
+const allDestinations = [
+  { id: 1, name: "Bali", location: "Indonesia", type: "Beach", price: 899, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4" },
+  { id: 2, name: "Paris", location: "France", type: "City", price: 1299, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34" },
+  { id: 3, name: "Tokyo", location: "Japan", type: "City", price: 1499, image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc" },
+  { id: 4, name: "New York", location: "USA", type: "City", price: 1199, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9" },
+  { id: 5, name: "Santorini", location: "Greece", type: "Beach", price: 1099, image: "https://images.unsplash.com/photo-1533105079780-92b9be482077" },
+  // ... add more from the search component destinations
+];
+
 const BookingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,16 +72,51 @@ const BookingPage = () => {
   // Parse URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const destParam = params.get("destination");
+    const destParam = params.get("destination") || params.get("name");
+    const locationParam = params.get("location");
     const dateParam = params.get("date");
     const guestsParam = params.get("guests");
-    const roomIdParam = params.get("roomId");
+    const idParam = params.get("id") || params.get("destinationId");
     
-    if (destParam) {
-      const found = popularDestinations.find(d => d.id === Number(destParam));
-      if (found) {
-        setDestination(found.name);
-        setSelectedDestination(found);
+    // First try to find by ID
+    if (idParam) {
+      const foundById = allDestinations.find(d => d.id === Number(idParam));
+      if (foundById) {
+        setDestination(`${foundById.name}, ${foundById.location}`);
+        
+        const formattedDestination = {
+          id: foundById.id,
+          name: `${foundById.name}, ${foundById.location}`,
+          image: foundById.image,
+          price: foundById.price
+        };
+        
+        setSelectedDestination(formattedDestination);
+      }
+    } 
+    // Then try by name and location
+    else if (destParam) {
+      let displayDest = destParam;
+      if (locationParam) {
+        displayDest += `, ${locationParam}`;
+      }
+      setDestination(displayDest);
+      
+      // Try to find in our destinations
+      const foundByName = allDestinations.find(
+        d => d.name.toLowerCase() === destParam.toLowerCase() || 
+             d.name.toLowerCase().includes(destParam.toLowerCase())
+      );
+      
+      if (foundByName) {
+        const formattedDestination = {
+          id: foundByName.id,
+          name: `${foundByName.name}, ${foundByName.location}`,
+          image: foundByName.image,
+          price: foundByName.price
+        };
+        
+        setSelectedDestination(formattedDestination);
       }
     }
     
@@ -83,10 +128,34 @@ const BookingPage = () => {
       setGuests(Number(guestsParam));
     }
     
-    if (roomIdParam) {
-      setShowSearchResults(true);
+    // If any search parameter was provided, show search results
+    if (destParam || idParam) {
       setHasSearched(true);
-      // Handle room ID if needed
+      setShowSearchResults(true);
+      
+      // Filter destinations based on search params
+      const filtered = allDestinations.filter(dest => {
+        if (idParam && dest.id === Number(idParam)) return true;
+        if (destParam && (
+          dest.name.toLowerCase().includes(String(destParam).toLowerCase()) || 
+          dest.location.toLowerCase().includes(String(destParam).toLowerCase())
+        )) return true;
+        return false;
+      });
+      
+      if (filtered.length > 0) {
+        const formattedResults = filtered.map(dest => ({
+          id: dest.id,
+          name: `${dest.name}, ${dest.location}`,
+          image: dest.image,
+          price: dest.price
+        }));
+        
+        setSearchResults(formattedResults);
+      } else {
+        // If no matches, show all popular destinations
+        setSearchResults(popularDestinations);
+      }
     }
   }, [location]);
   
@@ -94,18 +163,25 @@ const BookingPage = () => {
     e.preventDefault();
     // Filter destinations
     const filtered = destination ? 
-      popularDestinations.filter(dest => 
-        dest.name.toLowerCase().includes(destination.toLowerCase())
-      ) : popularDestinations;
+      allDestinations.filter(dest => 
+        `${dest.name}, ${dest.location}`.toLowerCase().includes(destination.toLowerCase())
+      ) : [];
     
-    setSearchResults(filtered.length > 0 ? filtered : popularDestinations);
+    const formattedResults = filtered.map(dest => ({
+      id: dest.id,
+      name: `${dest.name}, ${dest.location}`,
+      image: dest.image,
+      price: dest.price
+    }));
+    
+    setSearchResults(formattedResults.length > 0 ? formattedResults : popularDestinations);
     setHasSearched(true);
     setShowSearchResults(true);
     
-    if (filtered.length === 0) {
+    if (filtered.length === 0 && destination) {
       toast.info("No destinations found, showing all available options");
-    } else {
-      toast.success("Search results updated");
+    } else if (filtered.length > 0) {
+      toast.success(`Found ${filtered.length} destinations matching your search`);
     }
   };
   

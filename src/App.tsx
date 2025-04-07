@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 
 import HomePage from "./pages/HomePage";
 import BookingPage from "./pages/BookingPage";
@@ -21,23 +22,25 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/booking" element={<BookingPage />} />
-            <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/explore/destinations/:id" element={<DestinationDetailPage />} />
-            <Route path="/message" element={<MessagePage />} />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/signin" element={<SignInPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <UserPreferencesProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/booking" element={<BookingPage />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/explore/destinations/:id" element={<DestinationDetailPage />} />
+              <Route path="/message" element={<MessagePage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/signin" element={<SignInPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </UserPreferencesProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

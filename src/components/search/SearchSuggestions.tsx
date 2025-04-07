@@ -32,9 +32,14 @@ const allDestinations = [
 interface SearchSuggestionsProps {
   placeholder?: string;
   className?: string;
+  onlySearchInExplore?: boolean;
 }
 
-export function SearchSuggestions({ placeholder = "Search destinations...", className }: SearchSuggestionsProps) {
+export function SearchSuggestions({ 
+  placeholder = "Search destinations...", 
+  className = "", 
+  onlySearchInExplore = false 
+}: SearchSuggestionsProps) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<typeof allDestinations>([]);
@@ -78,10 +83,19 @@ export function SearchSuggestions({ placeholder = "Search destinations...", clas
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && query) {
+      navigate(`/explore?search=${encodeURIComponent(query)}`);
+      setShowSuggestions(false);
+    }
+  };
+
   const handleSuggestionClick = (destination: { id: number; name: string; location: string }) => {
     setQuery(`${destination.name}, ${destination.location}`);
     setShowSuggestions(false);
-    navigate(`/explore?search=${encodeURIComponent(destination.name)}`);
+    
+    // Navigate to destination details page instead of just search results
+    navigate(`/explore/destinations/${destination.id}?name=${encodeURIComponent(destination.name)}&location=${encodeURIComponent(destination.location)}`);
   };
 
   return (
@@ -93,6 +107,7 @@ export function SearchSuggestions({ placeholder = "Search destinations...", clas
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className="pl-10 w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
             onFocus={() => query && setShowSuggestions(true)}

@@ -6,6 +6,7 @@ import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
 import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
 import { useEffect, useState } from "react";
+import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 
 // Expanded popular rooms data with fallback images
 const popularRooms = [
@@ -100,6 +101,14 @@ const HomePage = () => {
         <h1 className="text-2xl font-bold mb-4 dark:text-white">Welcome to Voyage Vista{userName ? `, ${userName}` : ''}</h1>
       </div>
       
+      {/* Adding improved search suggestions component to home page */}
+      <div className="mb-8">
+        <SearchSuggestions 
+          placeholder="Search destinations, hotels, experiences..." 
+          className="max-w-2xl"
+        />
+      </div>
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
           title="Total Sales"
@@ -155,6 +164,7 @@ const HomePage = () => {
               <TripCard
                 key={trip.id}
                 image={trip.image}
+                fallbackImage={trip.fallbackImage}
                 title={trip.title}
                 date={trip.date}
               />

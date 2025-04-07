@@ -93,6 +93,35 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Improved dark mode text visibility */
+  .dark .text-gray-600, 
+  .dark .text-gray-500, 
+  .dark .text-gray-400 {
+    @apply text-gray-300;
+  }
+
+  .dark .border-gray-200,
+  .dark .border-gray-100 {
+    @apply border-gray-700;
+  }
+
+  /* Make sure charts and graphs are visible in dark mode */
+  .dark .recharts-text {
+    fill: currentColor;
+  }
+
+  /* Ensure button text is visible in dark mode */
+  .dark button {
+    @apply text-gray-200;
+  }
+
+  /* Ensure form inputs have visible text */
+  .dark input, 
+  .dark textarea, 
+  .dark select {
+    @apply bg-gray-800 text-white border-gray-700;
+  }
 }
 
 @layer utilities {
@@ -123,4 +152,21 @@
       opacity: 1;
     }
   }
+}
+
+/* Additional fixes for dark mode visibility */
+.dark .bg-gray-50 {
+  @apply bg-gray-900;
+}
+
+.dark .bg-white {
+  @apply bg-gray-800;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
+.dark .shadow-sm {
+  @apply shadow-gray-800;
 }
