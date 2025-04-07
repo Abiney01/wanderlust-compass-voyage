@@ -2,20 +2,24 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-type Currency = 'USD' | 'EUR' | 'GBP' | 'INR' | 'JPY' | 'AUD';
-type Language = 'English' | 'Spanish' | 'French' | 'German' | 'Hindi' | 'Japanese';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'INR' | 'JPY' | 'AUD';
+export type Language = 'English' | 'Spanish' | 'French' | 'German' | 'Hindi' | 'Japanese';
 
 interface UserPreferences {
   currency: Currency;
   language: Language;
+  userName: string;
+  userAvatar: string;
   setCurrency: (currency: Currency) => void;
   setLanguage: (language: Language) => void;
+  setUserName: (name: string) => void;
+  setUserAvatar: (avatar: string) => void;
   formatPrice: (amount: number) => string;
 }
 
 const UserPreferencesContext = createContext<UserPreferences | undefined>(undefined);
 
-const currencySymbols: Record<Currency, string> = {
+export const currencySymbols: Record<Currency, string> = {
   USD: '$',
   EUR: '€',
   GBP: '£',
@@ -36,14 +40,36 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
     return (saved as Language) || 'English';
   });
 
+  const [userName, setUserNameState] = useState<string>(() => {
+    return localStorage.getItem('user-name') || 'Voyager';
+  });
+
+  const [userAvatar, setUserAvatarState] = useState<string>(() => {
+    return localStorage.getItem('user-avatar') || 'https://github.com/shadcn.png';
+  });
+
   // Save preferences to localStorage when they change
   useEffect(() => {
     localStorage.setItem('user-currency', currency);
+    document.documentElement.setAttribute('data-currency', currency);
   }, [currency]);
 
   useEffect(() => {
     localStorage.setItem('user-language', language);
+    document.documentElement.setAttribute('data-language', language);
   }, [language]);
+
+  useEffect(() => {
+    if (userName) {
+      localStorage.setItem('user-name', userName);
+    }
+  }, [userName]);
+
+  useEffect(() => {
+    if (userAvatar) {
+      localStorage.setItem('user-avatar', userAvatar);
+    }
+  }, [userAvatar]);
 
   // Format price based on selected currency
   const formatPrice = (amount: number): string => {
@@ -83,13 +109,25 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
     toast.success(`Language changed to ${newLanguage}`);
   };
 
+  const setUserName = (name: string) => {
+    setUserNameState(name);
+  };
+
+  const setUserAvatar = (avatar: string) => {
+    setUserAvatarState(avatar);
+  };
+
   return (
     <UserPreferencesContext.Provider 
       value={{ 
         currency, 
         language, 
+        userName,
+        userAvatar,
         setCurrency, 
         setLanguage,
+        setUserName,
+        setUserAvatar,
         formatPrice
       }}
     >

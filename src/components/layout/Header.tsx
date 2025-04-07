@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, MessageCircle } from "lucide-react";
@@ -11,7 +10,6 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from "@/components/ui/popover";
-import { useTheme } from "@/components/theme/theme-provider";
 
 export function Header() {
   const navigate = useNavigate();
@@ -136,8 +134,6 @@ export function Header() {
           >
             <MessageCircle className="h-5 w-5" />
           </Button>
-          
-          <ModeToggle />
 
           <Button
             variant="ghost"
@@ -146,8 +142,8 @@ export function Header() {
             onClick={() => navigate("/settings")}
           >
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>SC</AvatarFallback>
+              <AvatarImage src={localStorage.getItem("user-avatar") || "https://github.com/shadcn.png"} alt="User" />
+              <AvatarFallback>{localStorage.getItem("user-name")?.substring(0, 2)?.toUpperCase() || "UV"}</AvatarFallback>
             </Avatar>
           </Button>
         </div>

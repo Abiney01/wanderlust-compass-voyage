@@ -5,8 +5,10 @@ import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
 import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SearchSuggestions } from "@/components/search/SearchSuggestions";
+import { useNavigate } from "react-router-dom";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 // Expanded popular rooms data with fallback images
 const popularRooms = [
@@ -85,15 +87,14 @@ const scheduledTrips = [
 ];
 
 const HomePage = () => {
-  const [userName, setUserName] = useState("Voyager");
+  const navigate = useNavigate();
+  const { userName, formatPrice } = useUserPreferences();
 
-  // Simulate getting user data
-  useEffect(() => {
-    const storedName = localStorage.getItem("user-name");
-    if (storedName) {
-      setUserName(storedName);
+  const handleSearch = (query: string) => {
+    if (query) {
+      navigate(`/explore?search=${encodeURIComponent(query)}`);
     }
-  }, []);
+  };
 
   return (
     <DashboardLayout>
@@ -106,13 +107,14 @@ const HomePage = () => {
         <SearchSuggestions 
           placeholder="Search destinations, hotels, experiences..." 
           className="max-w-2xl"
+          onSearch={handleSearch}
         />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
           title="Total Sales"
-          value="$120,900"
+          value={formatPrice(120900)}
           change={{ value: "12%", positive: true }}
           subtitle="+$1,900 today"
         />
@@ -130,7 +132,7 @@ const HomePage = () => {
         />
         <StatsCard
           title="Refunded"
-          value="$3,000"
+          value={formatPrice(3000)}
           change={{ value: "15%", positive: true }}
           subtitle="today"
         />

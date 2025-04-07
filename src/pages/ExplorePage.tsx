@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 // More comprehensive destinations data
 const destinations = [
@@ -134,6 +135,7 @@ const destinations = [
 const ExplorePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { formatPrice } = useUserPreferences();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<typeof destinations>([]);
   const [favorites, setFavorites] = useState<number[]>([]);
@@ -196,10 +198,28 @@ const ExplorePage = () => {
     setShowDetailsDialog(true);
     setShowSearchSuggestions(false);
   };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery) {
+      const results = destinations.filter(dest => 
+        dest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        dest.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      if (results.length > 0) {
+        // If we found results, show the first one
+        handleSelectSearchResult(results[0]);
+      } else {
+        toast.info("No destinations found matching your search");
+      }
+    }
+  };
   
   const filteredDestinations = destinations.filter(dest => {
-    const matchesSearch = dest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        dest.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchQuery || 
+                         dest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         dest.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = category === 'all' || dest.category === category;
     return matchesSearch && matchesCategory;
   });
@@ -211,13 +231,15 @@ const ExplorePage = () => {
           <h1 className="text-2xl font-bold dark:text-white">Explore Amazing Destinations</h1>
           
           <div className="w-full md:w-64 relative">
-            <Input
-              type="text"
-              placeholder="Search destinations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full dark:bg-gray-800 dark:text-white dark:border-gray-700"
-            />
+            <form onSubmit={handleSearch}>
+              <Input
+                type="text"
+                placeholder="Search destinations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full dark:bg-gray-800 dark:text-white dark:border-gray-700"
+              />
+            </form>
             
             {showSearchSuggestions && searchResults.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -233,7 +255,9 @@ const ExplorePage = () => {
                         alt={destination.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = destination.fallbackImage || "/placeholder.svg";
+                          if (destination.fallbackImage) {
+                            e.currentTarget.src = destination.fallbackImage;
+                          }
                         }}
                       />
                     </div>
@@ -283,7 +307,9 @@ const ExplorePage = () => {
                         onClick={() => handleViewDetails(destination.id)}
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.src = destination.fallbackImage || "/placeholder.svg";
+                          if (destination.fallbackImage) {
+                            e.currentTarget.src = destination.fallbackImage;
+                          }
                         }}
                       />
                       <button 
@@ -360,7 +386,9 @@ const ExplorePage = () => {
                   className="w-full h-full object-cover"
                   loading="lazy"
                   onError={(e) => {
-                    e.currentTarget.src = selectedDestination.fallbackImage || "/placeholder.svg";
+                    if (selectedDestination.fallbackImage) {
+                      e.currentTarget.src = selectedDestination.fallbackImage;
+                    }
                   }}
                 />
                 <button 

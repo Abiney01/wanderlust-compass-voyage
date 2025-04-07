@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 const popularDestinations = [
   {
@@ -53,18 +54,25 @@ const allDestinations = [
   { id: 3, name: "Tokyo", location: "Japan", type: "City", price: 1499, image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc" },
   { id: 4, name: "New York", location: "USA", type: "City", price: 1199, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9" },
   { id: 5, name: "Santorini", location: "Greece", type: "Beach", price: 1099, image: "https://images.unsplash.com/photo-1533105079780-92b9be482077" },
-  // ... add more from the search component destinations
+  { id: 6, name: "Grand Canyon", location: "Arizona, USA", type: "Nature", price: 899, image: "https://images.unsplash.com/photo-1575407371544-9d386af95330" },
+  { id: 7, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e" },
+  { id: 8, name: "Bora Bora", location: "French Polynesia", type: "Beach", price: 2199, image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46" },
+  { id: 9, name: "Kyoto", location: "Japan", type: "Cultural", price: 1399, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" },
+  { id: 10, name: "Northern Lights", location: "Iceland", type: "Nature", price: 1799, image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7" },
+  { id: 11, name: "Colosseum", location: "Rome, Italy", type: "Landmark", price: 1099, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5" },
+  { id: 12, name: "Great Barrier Reef", location: "Queensland, Australia", type: "Beach", price: 1699, image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5" }
 ];
 
 const BookingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { formatPrice } = useUserPreferences();
   const [destination, setDestination] = useState("");
   const [guests, setGuests] = useState(1);
   const [date, setDate] = useState<Date>();
   const [searchResults, setSearchResults] = useState(popularDestinations);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<typeof popularDestinations[0] | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<(typeof popularDestinations)[0] | null>(null);
   const [isBookingComplete, setIsBookingComplete] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -72,11 +80,11 @@ const BookingPage = () => {
   // Parse URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const destParam = params.get("destination") || params.get("name");
+    const destParam = params.get("destination");
     const locationParam = params.get("location");
     const dateParam = params.get("date");
     const guestsParam = params.get("guests");
-    const idParam = params.get("id") || params.get("destinationId");
+    const idParam = params.get("id");
     
     // First try to find by ID
     if (idParam) {
@@ -157,7 +165,7 @@ const BookingPage = () => {
         setSearchResults(popularDestinations);
       }
     }
-  }, [location]);
+  }, [location.search]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -287,7 +295,7 @@ const BookingPage = () => {
                   <div className="p-4">
                     <h3 className="font-semibold dark:text-white">{destination.name}</h3>
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-blue-600 dark:text-blue-400 font-bold">${destination.price}</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-bold">{formatPrice(destination.price)}</span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">per person</span>
                     </div>
                     <Button 
@@ -356,11 +364,11 @@ const BookingPage = () => {
                 </div>
                 <div className="flex items-center justify-between dark:text-white">
                   <span>Price per person:</span>
-                  <span className="font-medium">${selectedDestination?.price}</span>
+                  <span className="font-medium">{selectedDestination ? formatPrice(selectedDestination.price) : ''}</span>
                 </div>
                 <div className="flex items-center justify-between font-bold dark:text-white">
                   <span>Total:</span>
-                  <span>${selectedDestination ? selectedDestination.price * guests : 0}</span>
+                  <span>{selectedDestination ? formatPrice(selectedDestination.price * guests) : 0}</span>
                 </div>
                 
                 <div className="border-t pt-4 mt-2 dark:border-gray-700">
