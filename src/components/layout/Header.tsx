@@ -1,8 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Bell, Search, MessageCircle } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -10,6 +9,7 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from "@/components/ui/popover";
+import { ModeToggle } from "@/components/theme/mode-toggle";
 
 export function Header() {
   const navigate = useNavigate();
@@ -58,16 +58,7 @@ export function Header() {
     <header className="border-b bg-background dark:bg-gray-800">
       <div className="flex h-16 items-center px-4 sm:px-6">
         <div className="ml-auto flex items-center space-x-4">
-          <div className="hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-[200px] pl-8 md:w-[200px] lg:w-[300px]"
-              />
-            </div>
-          </div>
+          {/* Removed search bar */}
 
           <Popover>
             <PopoverTrigger asChild>
@@ -127,13 +118,8 @@ export function Header() {
             </PopoverContent>
           </Popover>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/message")}
-          >
-            <MessageCircle className="h-5 w-5" />
-          </Button>
+          {/* Replace Message icon with ModeToggle */}
+          <ModeToggle />
 
           <Button
             variant="ghost"

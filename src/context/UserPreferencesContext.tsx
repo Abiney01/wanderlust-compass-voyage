@@ -41,7 +41,7 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
   });
 
   const [userName, setUserNameState] = useState<string>(() => {
-    return localStorage.getItem('user-name') || 'Voyager';
+    return localStorage.getItem('user-name') || '';
   });
 
   const [userAvatar, setUserAvatarState] = useState<string>(() => {
@@ -52,11 +52,20 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
   useEffect(() => {
     localStorage.setItem('user-currency', currency);
     document.documentElement.setAttribute('data-currency', currency);
+    
+    // Force a re-render of price elements
+    const event = new CustomEvent('currencychange', { detail: currency });
+    window.dispatchEvent(event);
   }, [currency]);
 
   useEffect(() => {
     localStorage.setItem('user-language', language);
     document.documentElement.setAttribute('data-language', language);
+    document.documentElement.lang = language.toLowerCase();
+    
+    // Force a re-render of language-dependent elements
+    const event = new CustomEvent('languagechange', { detail: language });
+    window.dispatchEvent(event);
   }, [language]);
 
   useEffect(() => {

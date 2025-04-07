@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/Dashboard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,14 +13,16 @@ import { useUserPreferences } from "@/context/UserPreferencesContext";
 import { Bell, Globe, CreditCard, Languages, Wallet } from "lucide-react";
 
 const SettingsPage = () => {
-  const { currency, setCurrency, language, setLanguage } = useUserPreferences();
+  const { currency, setCurrency, language, setLanguage, userName, setUserName, userAvatar, setUserAvatar } = useUserPreferences();
   
   const [profile, setProfile] = useState({
-    name: "Alex Johnson",
-    email: "alex@example.com",
-    phone: "+1 (555) 123-4567",
-    bio: "Travel enthusiast and adventure seeker. Love exploring new places and meeting new people."
+    name: userName || "Alex Johnson",
+    email: localStorage.getItem('user-email') || "alex@example.com",
+    phone: localStorage.getItem('user-phone') || "+1 (555) 123-4567",
+    bio: localStorage.getItem('user-bio') || "Travel enthusiast and adventure seeker. Love exploring new places and meeting new people."
   });
+  
+  const [avatarUrl, setAvatarUrl] = useState(userAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80");
   
   const [notifications, setNotifications] = useState({
     marketing: true,
@@ -32,7 +33,28 @@ const SettingsPage = () => {
 
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    setUserName(profile.name);
+    
+    localStorage.setItem('user-email', profile.email);
+    localStorage.setItem('user-phone', profile.phone);
+    localStorage.setItem('user-bio', profile.bio);
+    
     toast.success("Profile updated successfully");
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setAvatarUrl(result);
+        setUserAvatar(result);
+        localStorage.setItem('user-avatar', result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
@@ -41,6 +63,12 @@ const SettingsPage = () => {
       [key]: !prev[key]
     }));
   };
+
+  useEffect(() => {
+    document.documentElement.lang = language.toLowerCase();
+    const title = document.title;
+    document.title = title;
+  }, [language]);
 
   return (
     <DashboardLayout>
@@ -58,7 +86,6 @@ const SettingsPage = () => {
             <TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger>
           </TabsList>
           
-          {/* Profile Tab */}
           <TabsContent value="profile">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
@@ -71,12 +98,23 @@ const SettingsPage = () => {
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div className="flex items-center space-x-4 mb-6">
                     <Avatar className="w-16 h-16">
-                      <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80" />
-                      <AvatarFallback>AJ</AvatarFallback>
+                      <AvatarImage src={avatarUrl} />
+                      <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <Button variant="outline" className="dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
-                      Change Photo
-                    </Button>
+                    <div>
+                      <input 
+                        type="file" 
+                        id="avatar-upload" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={handleAvatarChange}
+                      />
+                      <label htmlFor="avatar-upload">
+                        <Button variant="outline" className="dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" type="button" asChild>
+                          <span>Change Photo</span>
+                        </Button>
+                      </label>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -126,7 +164,6 @@ const SettingsPage = () => {
             </Card>
           </TabsContent>
           
-          {/* Preferences Tab */}
           <TabsContent value="preferences">
             <div className="grid gap-6">
               <Card className="dark:bg-gray-800 dark:border-gray-700">
@@ -218,7 +255,6 @@ const SettingsPage = () => {
             </div>
           </TabsContent>
           
-          {/* Notifications Tab */}
           <TabsContent value="notifications">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
@@ -284,7 +320,6 @@ const SettingsPage = () => {
             </Card>
           </TabsContent>
           
-          {/* Security Tab */}
           <TabsContent value="security">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
