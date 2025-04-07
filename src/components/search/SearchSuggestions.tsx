@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin } from "lucide-react";
@@ -33,12 +32,14 @@ interface SearchSuggestionsProps {
   placeholder?: string;
   className?: string;
   onlySearchInExplore?: boolean;
+  onSearch?: (query: string) => void;
 }
 
 export function SearchSuggestions({ 
   placeholder = "Search destinations...", 
   className = "", 
-  onlySearchInExplore = false 
+  onlySearchInExplore = false,
+  onSearch
 }: SearchSuggestionsProps) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -78,14 +79,26 @@ export function SearchSuggestions({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query) {
-      navigate(`/explore?search=${encodeURIComponent(query)}`);
+      if (onSearch) {
+        // Use the onSearch prop if provided
+        onSearch(query);
+      } else {
+        // Otherwise use the default navigation
+        navigate(`/explore?search=${encodeURIComponent(query)}`);
+      }
       setShowSuggestions(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && query) {
-      navigate(`/explore?search=${encodeURIComponent(query)}`);
+      if (onSearch) {
+        // Use the onSearch prop if provided
+        onSearch(query);
+      } else {
+        // Otherwise use the default navigation
+        navigate(`/explore?search=${encodeURIComponent(query)}`);
+      }
       setShowSuggestions(false);
     }
   };
