@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { ModeToggle } from "../theme/mode-toggle";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -13,6 +14,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <Header />
+        <div className="fixed right-6 top-4 z-10">
+          <ModeToggle />
+        </div>
         <div className="p-6">
           {children}
         </div>

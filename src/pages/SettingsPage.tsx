@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { User, Languages, Globe } from "lucide-react";
+import { User, Languages, Globe, IndianRupee } from "lucide-react";
 import { toast } from "sonner";
+import { useTheme } from "@/components/theme/theme-provider";
 
 // Constants for language and currency options
 const LANGUAGES = [
@@ -30,6 +31,8 @@ const CURRENCIES = [
 ];
 
 const SettingsPage = () => {
+  const { theme } = useTheme();
+
   // User profile state
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john.doe@example.com");
@@ -54,6 +57,14 @@ const SettingsPage = () => {
   useEffect(() => {
     localStorage.setItem("user-currency", currency);
     toast.success(`Currency updated to ${CURRENCIES.find(c => c.value === currency)?.label || currency}`);
+    
+    // Apply currency format to any price elements
+    const applyCurrencyFormat = () => {
+      const selectedCurrency = CURRENCIES.find(c => c.value === currency);
+      document.documentElement.style.setProperty('--currency-symbol', `"${selectedCurrency?.symbol || '$'}"`);
+    };
+    
+    applyCurrencyFormat();
   }, [currency]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +73,7 @@ const SettingsPage = () => {
       reader.onload = (e) => {
         if (e.target?.result) {
           setImage(e.target.result as string);
+          localStorage.setItem("user-image", e.target.result as string);
           toast.success("Profile image updated successfully");
         }
       };
@@ -71,13 +83,26 @@ const SettingsPage = () => {
 
   const handleNameChange = (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("user-name", name);
     toast.success(`Name updated to ${name}`);
   };
 
   const handleAddressChange = (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("user-address", address);
     toast.success(`Address updated to ${address}`);
   };
+  
+  // Load user data from localStorage on mount
+  useEffect(() => {
+    const storedName = localStorage.getItem("user-name");
+    const storedAddress = localStorage.getItem("user-address");
+    const storedImage = localStorage.getItem("user-image");
+    
+    if (storedName) setName(storedName);
+    if (storedAddress) setAddress(storedAddress);
+    if (storedImage) setImage(storedImage);
+  }, []);
 
   return (
     <DashboardLayout>
@@ -133,7 +158,7 @@ const SettingsPage = () => {
                         className="hover:border-blue-300 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"
                       />
                     </div>
-                    <Button type="submit" className="hover:scale-105 transition-transform">
+                    <Button type="submit" className="hover:scale-105 transition-transform dark:bg-blue-700 dark:hover:bg-blue-800">
                       Update Name
                     </Button>
                   </form>
@@ -162,7 +187,7 @@ const SettingsPage = () => {
                           className="hover:border-blue-300 focus:border-blue-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
                       </div>
-                      <Button type="submit" className="hover:scale-105 transition-transform">
+                      <Button type="submit" className="hover:scale-105 transition-transform dark:bg-blue-700 dark:hover:bg-blue-800">
                         Update Address
                       </Button>
                     </form>
@@ -178,7 +203,14 @@ const SettingsPage = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="language" className="dark:text-white">Language</Label>
-                  <Select value={language} onValueChange={setLanguage}>
+                  <Select value={language} onValueChange={(val) => {
+                    setLanguage(val);
+                    // Apply language change effect
+                    document.querySelectorAll('h1, h2, h3, p, span, button').forEach(el => {
+                      el.classList.add('animate-pulse');
+                      setTimeout(() => el.classList.remove('animate-pulse'), 500);
+                    });
+                  }}>
                     <SelectTrigger className="w-full dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
@@ -198,14 +230,24 @@ const SettingsPage = () => {
                 <div className="space-y-2">
                   <Label htmlFor="currency" className="dark:text-white">Currency</Label>
                   <div className="relative">
-                    <Select value={currency} onValueChange={setCurrency}>
+                    <Select value={currency} onValueChange={(val) => {
+                      setCurrency(val);
+                      // Apply currency change effect
+                      document.querySelectorAll('[data-currency]').forEach(el => {
+                        el.classList.add('animate-pulse');
+                        setTimeout(() => el.classList.remove('animate-pulse'), 500);
+                      });
+                    }}>
                       <SelectTrigger className="w-full dark:bg-gray-700 dark:text-white dark:border-gray-600">
                         <SelectValue placeholder="Select currency" />
                       </SelectTrigger>
                       <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                         {CURRENCIES.map(curr => (
                           <SelectItem key={curr.value} value={curr.value} className="dark:hover:bg-gray-600">
-                            {curr.label}
+                            <div className="flex items-center">
+                              {curr.value === 'inr' ? <IndianRupee size={14} className="mr-1" /> : null}
+                              {curr.label}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -229,11 +271,36 @@ const SettingsPage = () => {
                   <p className="text-sm dark:text-gray-300">
                     Currency: <span className="font-medium">{CURRENCIES.find(c => c.value === currency)?.label}</span>
                     {" "} 
-                    <span className="text-xs bg-gray-200 px-1.5 py-0.5 rounded-md dark:bg-gray-600">
+                    <span className="text-xs bg-gray-200 px-1.5 py-0.5 rounded-md dark:bg-gray-600" data-currency>
                       Example: {CURRENCIES.find(c => c.value === currency)?.symbol}100
                     </span>
                   </p>
+                  <p className="text-sm mt-2 dark:text-gray-300">
+                    Theme: <span className="font-medium capitalize">{theme}</span>
+                  </p>
                 </div>
+              </div>
+              
+              <div className="mt-8 flex justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setLanguage("english");
+                    setCurrency("usd");
+                    toast.info("Preferences have been reset to defaults");
+                  }}
+                  className="mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                >
+                  Reset to defaults
+                </Button>
+                <Button
+                  onClick={() => {
+                    toast.success("Your preferences have been applied");
+                  }}
+                  className="dark:bg-blue-700 dark:hover:bg-blue-800"
+                >
+                  Apply settings
+                </Button>
               </div>
             </div>
           </TabsContent>

@@ -10,7 +10,6 @@ import {
   LogOut 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "@/components/theme/mode-toggle";
 import { toast } from "sonner";
 
 const navItems = [
@@ -32,7 +31,8 @@ export function Sidebar() {
   
   const handleItemClick = (item: { name: string; path: string; action?: string }) => {
     if (item.action === "logout") {
-      // Handle logout
+      // Handle logout - clear any stored user data
+      localStorage.removeItem("user-data");
       toast.success("Successfully logged out");
       setTimeout(() => {
         navigate("/signin");
@@ -92,9 +92,6 @@ export function Sidebar() {
             <span className="text-sm font-medium">{item.name}</span>
           </button>
         ))}
-        <div className="px-3 py-2">
-          <ModeToggle />
-        </div>
       </div>
     </div>
   );

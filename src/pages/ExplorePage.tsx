@@ -14,7 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { SearchSuggestions } from "@/components/search/SearchSuggestions";
+import { Input } from "@/components/ui/input";
 
 // More comprehensive destinations data
 const destinations = [
@@ -23,6 +23,7 @@ const destinations = [
     name: "Grand Canyon",
     location: "Arizona, USA",
     image: "https://images.unsplash.com/photo-1575407371544-9d386af95330?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     rating: 4.8,
     category: "nature",
     description: "One of the most spectacular natural wonders of the world."
@@ -32,6 +33,7 @@ const destinations = [
     name: "Eiffel Tower",
     location: "Paris, France",
     image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     rating: 4.7,
     category: "landmark",
     description: "Iconic symbol of Paris and one of the most famous structures in the world."
@@ -41,6 +43,7 @@ const destinations = [
     name: "Bora Bora",
     location: "French Polynesia",
     image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     rating: 4.9,
     category: "beach",
     description: "A small South Pacific island northwest of Tahiti with stunning turquoise lagoons."
@@ -132,10 +135,12 @@ const ExplorePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof destinations>([]);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [category, setCategory] = useState<string>("all");
   const [selectedDestination, setSelectedDestination] = useState<typeof destinations[0] | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   
   // Get search query from URL if any
   useEffect(() => {
@@ -145,6 +150,20 @@ const ExplorePage = () => {
       setSearchQuery(search);
     }
   }, [location.search]);
+
+  // Update search results when query changes
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      const results = destinations.filter(dest => 
+        dest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        dest.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(results);
+      setShowSearchSuggestions(true);
+    } else {
+      setShowSearchSuggestions(false);
+    }
+  }, [searchQuery]);
   
   const toggleFavorite = (id: number) => {
     setFavorites(prev => 
@@ -171,6 +190,13 @@ const ExplorePage = () => {
     }
   };
   
+  const handleSelectSearchResult = (destination: typeof destinations[0]) => {
+    setSearchQuery(destination.name);
+    setSelectedDestination(destination);
+    setShowDetailsDialog(true);
+    setShowSearchSuggestions(false);
+  };
+  
   const filteredDestinations = destinations.filter(dest => {
     const matchesSearch = dest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         dest.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -183,7 +209,43 @@ const ExplorePage = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-2xl font-bold dark:text-white">Explore Amazing Destinations</h1>
-          <SearchSuggestions className="w-full md:w-64" />
+          
+          <div className="w-full md:w-64 relative">
+            <Input
+              type="text"
+              placeholder="Search destinations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full dark:bg-gray-800 dark:text-white dark:border-gray-700"
+            />
+            
+            {showSearchSuggestions && searchResults.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {searchResults.slice(0, 6).map(destination => (
+                  <div 
+                    key={destination.id}
+                    className="flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleSelectSearchResult(destination)}
+                  >
+                    <div className="w-12 h-12 rounded-md overflow-hidden mr-3">
+                      <img 
+                        src={destination.image} 
+                        alt={destination.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = destination.fallbackImage || "/placeholder.svg";
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p className="font-medium dark:text-white">{destination.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{destination.location}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
         <Tabs value={category} onValueChange={setCategory} className="mb-8">
@@ -220,6 +282,9 @@ const ExplorePage = () => {
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
                         onClick={() => handleViewDetails(destination.id)}
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = destination.fallbackImage || "/placeholder.svg";
+                        }}
                       />
                       <button 
                         onClick={(e) => {
@@ -255,7 +320,7 @@ const ExplorePage = () => {
                         {destination.description}
                       </p>
                       <Button 
-                        className="w-full mt-3 group-hover:bg-blue-600 transition-colors"
+                        className="w-full mt-3 group-hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
                         onClick={() => handleViewDetails(destination.id)}
                       >
                         View Details
@@ -294,6 +359,9 @@ const ExplorePage = () => {
                   alt={selectedDestination.name}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = selectedDestination.fallbackImage || "/placeholder.svg";
+                  }}
                 />
                 <button 
                   onClick={() => toggleFavorite(selectedDestination.id)}
@@ -349,7 +417,9 @@ const ExplorePage = () => {
                 <Button onClick={() => {
                   setShowDetailsDialog(false);
                   navigate(`/booking?destination=${encodeURIComponent(selectedDestination.name)}&location=${encodeURIComponent(selectedDestination.location)}&id=${selectedDestination.id}`);
-                }}>
+                }}
+                className="dark:bg-blue-700 dark:hover:bg-blue-800"
+                >
                   Book This Destination
                 </Button>
               </DialogFooter>

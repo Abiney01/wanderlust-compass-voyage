@@ -5,12 +5,14 @@ import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
 import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
+import { useEffect, useState } from "react";
 
-// Expanded popular rooms data
+// Expanded popular rooms data with fallback images
 const popularRooms = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "City View",
     location: "Shimane Villa",
     price: 199
@@ -18,6 +20,7 @@ const popularRooms = [
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Classic Room",
     location: "Shimane Villa",
     price: 199
@@ -25,6 +28,7 @@ const popularRooms = [
   {
     id: 3,
     image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Greecevillage",
     location: "Shimane Villa",
     price: 199
@@ -32,6 +36,7 @@ const popularRooms = [
   {
     id: 4,
     image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Mountain View Suite",
     location: "Alpine Retreat",
     price: 299
@@ -39,6 +44,7 @@ const popularRooms = [
   {
     id: 5,
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Ocean Front Villa",
     location: "Coastal Resort",
     price: 399
@@ -46,6 +52,7 @@ const popularRooms = [
   {
     id: 6,
     image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Luxury Penthouse",
     location: "Downtown Heights",
     price: 499
@@ -56,28 +63,41 @@ const scheduledTrips = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Aling Waterfall",
     date: "01-04 July 2022"
   },
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1601581875039-e899893d520c?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Prager Wildsee",
     date: "12-19 July 2022"
   },
   {
     id: 3,
     image: "https://images.unsplash.com/photo-1502636621341-4846e29a3496?auto=format&fit=crop&w=600&h=350",
+    fallbackImage: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=600&h=350",
     title: "Grouste Vista",
     date: "07-12 August 2022"
   }
 ];
 
 const HomePage = () => {
+  const [userName, setUserName] = useState("Voyager");
+
+  // Simulate getting user data
+  useEffect(() => {
+    const storedName = localStorage.getItem("user-name");
+    if (storedName) {
+      setUserName(storedName);
+    }
+  }, []);
+
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4 dark:text-white">Welcome to Voyage Vista</h1>
+        <h1 className="text-2xl font-bold mb-4 dark:text-white">Welcome to Voyage Vista{userName ? `, ${userName}` : ''}</h1>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
