@@ -1,12 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/Dashboard";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Heart, MapPin, Star } from "lucide-react";
+import { Heart, MapPin, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
-import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 import { toast } from "sonner";
 import { 
   Dialog,
@@ -16,13 +14,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 
+// More comprehensive destinations data
 const destinations = [
   {
     id: 1,
     name: "Grand Canyon",
     location: "Arizona, USA",
-    image: "https://images.unsplash.com/photo-1575407371544-9d386af95330",
+    image: "https://images.unsplash.com/photo-1575407371544-9d386af95330?auto=format&fit=crop&w=600&h=350",
     rating: 4.8,
     category: "nature",
     description: "One of the most spectacular natural wonders of the world."
@@ -31,7 +31,7 @@ const destinations = [
     id: 2,
     name: "Eiffel Tower",
     location: "Paris, France",
-    image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e",
+    image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e?auto=format&fit=crop&w=600&h=350",
     rating: 4.7,
     category: "landmark",
     description: "Iconic symbol of Paris and one of the most famous structures in the world."
@@ -40,7 +40,7 @@ const destinations = [
     id: 3,
     name: "Bora Bora",
     location: "French Polynesia",
-    image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46",
+    image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46?auto=format&fit=crop&w=600&h=350",
     rating: 4.9,
     category: "beach",
     description: "A small South Pacific island northwest of Tahiti with stunning turquoise lagoons."
@@ -49,7 +49,7 @@ const destinations = [
     id: 4,
     name: "Kyoto Temples",
     location: "Kyoto, Japan",
-    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e",
+    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&h=350",
     rating: 4.6,
     category: "cultural",
     description: "Historic city known for its numerous classical Buddhist temples and gardens."
@@ -58,7 +58,7 @@ const destinations = [
     id: 5,
     name: "Northern Lights",
     location: "Iceland",
-    image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7",
+    image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=600&h=350",
     rating: 5.0,
     category: "nature",
     description: "Natural light display in the Earth's sky, predominantly seen in high-latitude regions."
@@ -67,7 +67,7 @@ const destinations = [
     id: 6,
     name: "Colosseum",
     location: "Rome, Italy",
-    image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5",
+    image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&h=350",
     rating: 4.5,
     category: "landmark",
     description: "Ancient amphitheatre in the center of Rome and one of Italy's most popular tourist attractions."
@@ -76,7 +76,7 @@ const destinations = [
     id: 7,
     name: "Great Barrier Reef",
     location: "Queensland, Australia",
-    image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5",
+    image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&w=600&h=350",
     rating: 4.8,
     category: "beach",
     description: "World's largest coral reef system composed of over 2,900 individual reefs."
@@ -85,10 +85,46 @@ const destinations = [
     id: 8,
     name: "Machu Picchu",
     location: "Cusco, Peru",
-    image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1",
+    image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=600&h=350",
     rating: 4.9,
     category: "cultural",
     description: "15th-century Inca citadel situated on a mountain ridge above the Sacred Valley."
+  },
+  {
+    id: 9,
+    name: "Santorini",
+    location: "Greece",
+    image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=600&h=350",
+    rating: 4.7,
+    category: "beach",
+    description: "Famous for its stunning white buildings with blue domes overlooking the sea."
+  },
+  {
+    id: 10,
+    name: "Mount Fuji",
+    location: "Japan",
+    image: "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=600&h=350",
+    rating: 4.9,
+    category: "nature",
+    description: "Japan's highest mountain and an active volcano, known for its perfectly symmetrical cone."
+  },
+  {
+    id: 11,
+    name: "Taj Mahal",
+    location: "Agra, India",
+    image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&h=350",
+    rating: 4.8,
+    category: "landmark",
+    description: "An ivory-white marble mausoleum built by Emperor Shah Jahan in memory of his wife."
+  },
+  {
+    id: 12,
+    name: "Petra",
+    location: "Jordan",
+    image: "https://images.unsplash.com/photo-1579606032821-4e6634c3e454?auto=format&fit=crop&w=600&h=350",
+    rating: 4.8,
+    category: "historical",
+    description: "Ancient city famous for its rock-cut architecture and water conduit system."
   }
 ];
 
@@ -183,6 +219,7 @@ const ExplorePage = () => {
                         alt={destination.name} 
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
                         onClick={() => handleViewDetails(destination.id)}
+                        loading="lazy"
                       />
                       <button 
                         onClick={(e) => {
@@ -256,6 +293,7 @@ const ExplorePage = () => {
                   src={selectedDestination.image} 
                   alt={selectedDestination.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
                 <button 
                   onClick={() => toggleFavorite(selectedDestination.id)}
@@ -310,7 +348,7 @@ const ExplorePage = () => {
                 </Button>
                 <Button onClick={() => {
                   setShowDetailsDialog(false);
-                  navigate(`/booking?destination=${selectedDestination.id}`);
+                  navigate(`/booking?destination=${encodeURIComponent(selectedDestination.name)}&location=${encodeURIComponent(selectedDestination.location)}&id=${selectedDestination.id}`);
                 }}>
                   Book This Destination
                 </Button>

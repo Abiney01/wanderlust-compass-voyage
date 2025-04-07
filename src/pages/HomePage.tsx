@@ -10,42 +10,42 @@ import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
 const popularRooms = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304",
+    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=600&h=350",
     title: "City View",
     location: "Shimane Villa",
     price: 199
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd",
+    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&h=350",
     title: "Classic Room",
     location: "Shimane Villa",
     price: 199
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39",
+    image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&h=350",
     title: "Greecevillage",
     location: "Shimane Villa",
     price: 199
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427",
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&h=350",
     title: "Mountain View Suite",
     location: "Alpine Retreat",
     price: 299
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     title: "Ocean Front Villa",
     location: "Coastal Resort",
     price: 399
   },
   {
     id: 6,
-    image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461",
+    image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&h=350",
     title: "Luxury Penthouse",
     location: "Downtown Heights",
     price: 499
@@ -55,19 +55,19 @@ const popularRooms = [
 const scheduledTrips = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d",
+    image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?auto=format&fit=crop&w=600&h=350",
     title: "Aling Waterfall",
     date: "01-04 July 2022"
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1601581875039-e899893d520c",
+    image: "https://images.unsplash.com/photo-1601581875039-e899893d520c?auto=format&fit=crop&w=600&h=350",
     title: "Prager Wildsee",
     date: "12-19 July 2022"
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1502636621341-4846e29a3496",
+    image: "https://images.unsplash.com/photo-1502636621341-4846e29a3496?auto=format&fit=crop&w=600&h=350",
     title: "Grouste Vista",
     date: "07-12 August 2022"
   }
@@ -77,10 +77,10 @@ const HomePage = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">Welcome to TravelEase</h1>
+        <h1 className="text-2xl font-bold mb-4 dark:text-white">Welcome to Voyage Vista</h1>
       </div>
       
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
           title="Total Sales"
           value="$120,900"
@@ -115,7 +115,7 @@ const HomePage = () => {
         </div>
         
         {/* Calendar - Taking 1/3 of the width */}
-        <div>
+        <div className="dark:bg-gray-800 dark:text-white rounded-lg p-2">
           <Calendar />
         </div>
       </div>
@@ -123,13 +123,13 @@ const HomePage = () => {
       {/* Booking Stats and My Schedule Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Booking Chart - Taking 2/3 of the width */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 dark:bg-gray-800 dark:text-white p-4 rounded-lg">
           <BookingChart className="animate-fade-in" />
         </div>
         
         {/* My Schedule - Taking 1/3 of the width */}
-        <div>
-          <h2 className="text-lg font-bold mb-4">My Schedule</h2>
+        <div className="dark:bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-lg font-bold mb-4 dark:text-white">My Schedule</h2>
           <div className="space-y-3">
             {scheduledTrips.map(trip => (
               <TripCard
