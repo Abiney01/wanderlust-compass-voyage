@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,19 +16,35 @@ export function ContactForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate sending email
-    setTimeout(() => {
-      // In a real application, you would send the message to your backend
-      console.log("Sending message:", { name, email, subject, message });
-      toast.success("Your message has been sent successfully. We'll get back to you soon!");
-      
-      // Reset form
-      setName("");
-      setEmail("");
-      setSubject("");
-      setMessage("");
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("subject", subject);
+    formData.append("message", message);
+
+    try {
+      const response = await fetch("https://formspree.io/f/xzzzybrg", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Your message has been sent successfully. We'll get back to you soon!");
+        setName("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+      } else {
+        toast.error("Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      toast.error("Failed to send message. Please check your connection.");
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -41,6 +56,7 @@ export function ContactForm() {
           </label>
           <Input 
             id="name" 
+            name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -54,6 +70,7 @@ export function ContactForm() {
           </label>
           <Input 
             id="email" 
+            name="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -70,6 +87,7 @@ export function ContactForm() {
         </label>
         <Input 
           id="subject" 
+          name="subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           required
@@ -84,6 +102,7 @@ export function ContactForm() {
         </label>
         <Textarea 
           id="message" 
+          name="message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required
