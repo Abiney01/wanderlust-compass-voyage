@@ -16,7 +16,7 @@ interface SearchSuggestionsProps {
 }
 
 export function SearchSuggestions({ 
-  placeholder = "Search destinations...", 
+  placeholder = "Search for places, destinations...", 
   className = "", 
   onlySearchInExplore = false,
   onSearch
@@ -107,7 +107,7 @@ export function SearchSuggestions({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={translate('searchPlaceholder') || "Search destinations..."}
+            placeholder={translate('searchPlaceholder') || "Search for places, destinations..."}
             className="pl-10 w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
             onFocus={() => query && setShowSuggestions(true)}
           />
