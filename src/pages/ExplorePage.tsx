@@ -23,7 +23,7 @@ const destinations = [
     id: 1,
     name: "Grand Canyon",
     location: "Arizona, USA",
-    image: "https://images.unsplash.com/photo-1575407371544-9d386af95330?auto=format&fit=crop&w=600&h=350",
+    image: "https://images.unsplash.com/photo-1615551043360-33de8b5f410c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z3JhbmQlMjBjYW55b258ZW58MHx8MHx8fDA%3D",
     fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     rating: 4.8,
     category: "nature",
@@ -33,7 +33,7 @@ const destinations = [
     id: 2,
     name: "Eiffel Tower",
     location: "Paris, France",
-    image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e?auto=format&fit=crop&w=600&h=350",
+    image: "https://images.unsplash.com/photo-1439393161192-32360eb753f1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZWlmZmVsJTIwdG93ZXJ8ZW58MHx8MHx8fDA%3D",
     fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
     rating: 4.7,
     category: "landmark",
@@ -125,11 +125,21 @@ const destinations = [
     id: 12,
     name: "Petra",
     location: "Jordan",
-    image: "https://images.unsplash.com/photo-1579606032821-4e6634c3e454?auto=format&fit=crop&w=600&h=350",
+    image: "https://media.istockphoto.com/id/1418510499/photo/woman-visiting-petra-ancient-city-in-jordan.webp?a=1&b=1&s=612x612&w=0&k=20&c=l4aNVtxk8udoMhqafak-GlnLx76LBX0u3_jR5Re1_Mw=",
     rating: 4.8,
     category: "historical",
     description: "Ancient city famous for its rock-cut architecture and water conduit system."
+  },
+  {
+    id: 13,
+    name: "Bali",
+    location: "Indonesia",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4",
+    rating: 4.8,
+    description: "Known for its forested volcanic mountains, iconic rice paddies, beaches and coral reefs. The island is home to religious sites such as cliffside Uluwatu Temple.",
   }
+  
+  
 ];
 
 const ExplorePage = () => {

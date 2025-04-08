@@ -114,7 +114,7 @@ export function SearchSuggestions({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={translate('searchPlaceholder') || "Search destinations, places..."}
+            placeholder={translate('Search destinations, places...') || "Search destinations, places..."}
             className="pl-10 w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
             onFocus={() => query && setShowSuggestions(true)}
           />

@@ -49,18 +49,26 @@ const popularDestinations = [
 
 // Get all destination details including from search component
 const allDestinations = [
-  { id: 1, name: "Bali", location: "Indonesia", type: "Beach", price: 899, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4" },
-  { id: 2, name: "Paris", location: "France", type: "City", price: 1299, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34" },
-  { id: 3, name: "Tokyo", location: "Japan", type: "City", price: 1499, image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc" },
-  { id: 4, name: "New York", location: "USA", type: "City", price: 1199, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9" },
-  { id: 5, name: "Santorini", location: "Greece", type: "Beach", price: 1099, image: "https://images.unsplash.com/photo-1533105079780-92b9be482077" },
-  { id: 6, name: "Grand Canyon", location: "Arizona, USA", type: "Nature", price: 899, image: "https://images.unsplash.com/photo-1575407371544-9d386af95330" },
-  { id: 7, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e" },
-  { id: 8, name: "Bora Bora", location: "French Polynesia", type: "Beach", price: 2199, image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46" },
-  { id: 9, name: "Kyoto", location: "Japan", type: "Cultural", price: 1399, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" },
-  { id: 10, name: "Northern Lights", location: "Iceland", type: "Nature", price: 1799, image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7" },
-  { id: 11, name: "Colosseum", location: "Rome, Italy", type: "Landmark", price: 1099, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5" },
-  { id: 12, name: "Great Barrier Reef", location: "Queensland, Australia", type: "Beach", price: 1699, image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5" }
+  { id: 13, name: "Bali", location: "Indonesia", type: "Beach", price: 899, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4" },
+  { id: 2, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e" },
+  { id: 4, name: "Kyoto Temples", location: "Kyoto, Japan", type: "Cultural", price: 1399, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" },
+  { id: 3, name: "Bora Bora", location: "French Polynesia", type: "Beach", price: 2199, image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46" },
+  { id: 5, name: "Northern Lights", location: "Iceland", type: "Nature", price: 1799, image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7" },
+  { id: 6, name: "Colosseum", location: "Rome, Italy", type: "Landmark", price: 1099, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5" },
+  { id: 7, name: "Great Barrier Reef", location: "Queensland, Australia", type: "Beach", price: 1699, image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5" },
+  { id: 8, name: "Machu Picchu", location: "Cusco, Peru", type: "Cultural", price: 1599, image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1" },
+  { id: 9, name: "Santorini", location: "Greece", type: "Beach", price: 1099, image: "https://images.unsplash.com/photo-1533105079780-92b9be482077" },
+  { id: 10, name: "Mount Fuji", location: "Japan", type: "Nature", price: 1199, image: "https://images.unsplash.com/photo-1570789210967-2cac24afeb00" },
+  { id: 11, name: "Taj Mahal", location: "Agra, India", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1564507592333-c60657eea523" },
+  { id: 12, name: "Petra", location: "Jordan", type: "Historical", price: 1399, image: "https://media.istockphoto.com/id/1418510499/photo/woman-visiting-petra-ancient-city-in-jordan.webp?a=1&b=1&s=612x612&w=0&k=20&c=l4aNVtxk8udoMhqafak-GlnLx76LBX0u3_jR5Re1_Mw=" },
+  {
+    id: 1,
+    name: "Grand Canyon",
+    location: "Arizona, USA",
+    type: "Nature",
+    price: 899,
+    image: "https://images.unsplash.com/photo-1575407371544-9d386af95330"
+  }
 ];
 
 const BookingPage = () => {

@@ -10,53 +10,279 @@ import { toast } from "sonner";
 const allDestinations = [
   {
     id: 1,
-    name: "Bali, Indonesia",
-    description: "Known for its forested volcanic mountains, iconic rice paddies, beaches and coral reefs. The island is home to religious sites such as cliffside Uluwatu Temple.",
-    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4",
+    name: "Grand Canyon",
+    location: "Arizona, USA",
+    image: "https://images.unsplash.com/photo-1615551043360-33de8b5f410c",
     rating: 4.8,
-    price: 899,
-    duration: "7 days",
-    activities: ["Beach relaxation", "Temple visits", "Water sports", "Cultural shows"],
-    weather: "Tropical, warm year-round",
-    bestTime: "April to October",
+    category: "nature",
+    description: "One of the most spectacular natural wonders of the world.",
+    price: 799,
+    duration: "3 days",
+    activities: ["Hiking", "Rafting", "Photography"],
+    weather: "Hot summers, cool winters",
+    bestTime: "March to May, September to November",
     reviews: [
-      { user: "Sarah J.", comment: "Beautiful destination. Loved the beaches and temples.", rating: 5 },
-      { user: "Mike T.", comment: "Great food and friendly locals. Will definitely return.", rating: 4.5 }
+      { user: "Alex M.", comment: "Breathtaking views and a must-visit!", rating: 5 },
+      { user: "Lina V.", comment: "Very scenic but can get crowded.", rating: 4.5 }
     ]
   },
   {
     id: 2,
-    name: "Paris, France",
-    description: "The City of Light draws millions of visitors every year with its unforgettable ambiance. Of course, the divine cuisine and vast art collections deserve some credit as well.",
+    name: "Eiffel Tower",
+    location: "Paris, France",
     image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
     rating: 4.7,
+    category: "landmark",
+    description: "Iconic symbol of Paris and one of the most famous structures in the world.",
     price: 1299,
     duration: "5 days",
-    activities: ["Eiffel Tower", "Louvre Museum", "Seine River Cruise", "Notre-Dame Cathedral"],
-    weather: "Temperate, four distinct seasons",
+    activities: ["Eiffel Tower", "Louvre", "Cruise on Seine"],
+    weather: "Temperate",
     bestTime: "April to June, September to October",
     reviews: [
-      { user: "Emily R.", comment: "The most romantic city! Loved every moment.", rating: 5 },
-      { user: "David L.", comment: "Excellent food and art. A bit crowded though.", rating: 4 }
+      { user: "Sophie L.", comment: "A romantic getaway. Paris is magical.", rating: 5 },
+      { user: "Leo D.", comment: "Great food and culture!", rating: 4.3 }
     ]
   },
   {
     id: 3,
-    name: "Tokyo, Japan",
-    description: "A city where ultramodern and traditional blend, from neon-lit skyscrapers to historic temples.",
-    image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc",
+    name: "Bora Bora",
+    location: "French Polynesia",
+    image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
     rating: 4.9,
+    category: "beach",
+    description: "A small South Pacific island northwest of Tahiti with stunning turquoise lagoons.",
+    price: 2499,
+    duration: "7 days",
+    activities: ["Snorkeling", "Resort stay", "Lagoon tours"],
+    weather: "Warm and humid",
+    bestTime: "May to October",
+    reviews: [
+      { user: "Nina R.", comment: "Absolute paradise!", rating: 5 },
+      { user: "Jason M.", comment: "Expensive but worth it.", rating: 4.8 }
+    ]
+  },
+  {
+    id: 4,
+    name: "Kyoto Temples",
+    location: "Kyoto, Japan",
+    image: "https://images.unsplash.com/photo-1561390368-5c1f4f8b5d1c",
+    rating: 4.6,
+    category: "cultural",
+    description: "Historic city known for its numerous classical Buddhist temples and gardens.",
+    price: 999,
+    duration: "6 days",
+    activities: ["Temple tours", "Tea ceremonies", "Cultural performances"],
+    weather: "Four seasons",
+    bestTime: "March to May, October to November",
+    reviews: [
+      { user: "Aiko S.", comment: "Beautiful and peaceful.", rating: 5 },
+      { user: "Tom H.", comment: "Great cultural experience.", rating: 4.4 }
+    ]
+  },
+  {
+    id: 5,
+    name: "Northern Lights",
+    location: "Iceland",
+    image: "https://images.unsplash.com/photo-1511497584788-876760111969",
+    rating: 5.0,
+    category: "nature",
+    description: "Natural light display in the Earth's sky, predominantly seen in high-latitude regions.",
+    price: 1699,
+    duration: "4 days",
+    activities: ["Aurora tours", "Hot springs", "Glacier hiking"],
+    weather: "Cold, snowy winters",
+    bestTime: "September to April",
+    reviews: [
+      { user: "Chris W.", comment: "Magical and unforgettable!", rating: 5 },
+      { user: "Erica Z.", comment: "A unique experience, dress warmly!", rating: 4.9 }
+    ]
+  },
+  {
+    id: 6,
+    name: "Colosseum",
+    location: "Rome, Italy",
+    image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&h=350",
+    rating: 4.5,
+    category: "landmark",
+    description: "Ancient amphitheatre in the center of Rome and one of Italy's most popular tourist attractions.",
+    price: 899,
+    duration: "3 days",
+    activities: ["Historic tours", "City walks", "Museum visits"],
+    weather: "Mediterranean",
+    bestTime: "April to June, September to October",
+    reviews: [
+      { user: "Marco P.", comment: "Amazing piece of history.", rating: 4.7 },
+      { user: "Jade F.", comment: "Busy but worth it.", rating: 4.3 }
+    ]
+  },
+  {
+    id: 7,
+    name: "Great Barrier Reef",
+    location: "Queensland, Australia",
+    image: "https://images.unsplash.com/photo-1544551763-6bfd099dd7d4",
+    rating: 4.8,
+    category: "beach",
+    description: "World's largest coral reef system composed of over 2,900 individual reefs.",
+    price: 1899,
+    duration: "6 days",
+    activities: ["Scuba diving", "Snorkeling", "Boat tours"],
+    weather: "Tropical",
+    bestTime: "June to October",
+    reviews: [
+      { user: "Liam G.", comment: "Marine life was spectacular!", rating: 5 },
+      { user: "Zoey N.", comment: "Beautiful underwater scenes.", rating: 4.6 }
+    ]
+  },
+  {
+    id: 8,
+    name: "Machu Picchu",
+    location: "Cusco, Peru",
+    image: "https://images.unsplash.com/photo-1526662092594-e98c1e356d6a",
+    rating: 4.9,
+    category: "cultural",
+    description: "15th-century Inca citadel situated on a mountain ridge above the Sacred Valley.",
     price: 1499,
-    duration: "10 days",
-    activities: ["Mt. Fuji day trip", "Tokyo Skytree", "Shibuya Crossing", "Senso-ji Temple"],
-    weather: "Four seasons with mild winters and warm summers",
+    duration: "5 days",
+    activities: ["Hiking", "Inca trail", "Cultural exploration"],
+    weather: "Tropical mountain",
+    bestTime: "April to October",
+    reviews: [
+      { user: "Carlos R.", comment: "Spiritual and majestic!", rating: 5 },
+      { user: "Emily D.", comment: "Loved the hike and the view.", rating: 4.9 }
+    ]
+  },
+  {
+    id: 9,
+    name: "Santorini",
+    location: "Greece",
+    image: "https://images.unsplash.com/photo-1508598895300-60bfb2c44265",
+    rating: 4.7,
+    category: "beach",
+    description: "Famous for its stunning white buildings with blue domes overlooking the sea.",
+    price: 1399,
+    duration: "5 days",
+    activities: ["Sunset views", "Wine tasting", "Beach relaxation"],
+    weather: "Mediterranean",
+    bestTime: "May to October",
+    reviews: [
+      { user: "Niko K.", comment: "Perfect for a honeymoon.", rating: 5 },
+      { user: "Sasha Y.", comment: "Absolutely dreamy!", rating: 4.6 }
+    ]
+  },
+  {
+    id: 10,
+    name: "Mount Fuji",
+    location: "Japan",
+    image: "https://images.unsplash.com/photo-1549921296-3a6b63b8f137",
+    rating: 4.9,
+    category: "nature",
+    description: "Japan's highest mountain and an active volcano, known for its perfectly symmetrical cone.",
+    price: 999,
+    duration: "3 days",
+    activities: ["Hiking", "Photography", "Scenic train rides"],
+    weather: "Snow in winter, mild in summer",
+    bestTime: "July to September",
+    reviews: [
+      { user: "Haruto M.", comment: "Challenging climb but so rewarding!", rating: 5 },
+      { user: "Amy S.", comment: "Best view in Japan.", rating: 4.9 }
+    ]
+  },
+  {
+    id: 11,
+    name: "Taj Mahal",
+    location: "Agra, India",
+    image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&h=350",
+    rating: 4.8,
+    category: "landmark",
+    description: "An ivory-white marble mausoleum built by Emperor Shah Jahan in memory of his wife.",
+    price: 999,
+    duration: "3 days",
+    activities: [
+      "Guided tour of the Taj Mahal",
+      "Visit Agra Fort",
+      "Local cuisine tasting",
+      "Shopping in local bazaars"
+    ],
+    weather: "Hot summers, cool winters",
+    bestTime: "October to March",
+    reviews: [
+      {
+        user: "Priya S.",
+        comment: "Stunning architecture and deeply moving history.",
+        rating: 5
+      },
+      {
+        user: "Alex B.",
+        comment: "Beautiful place, best seen at sunrise!",
+        rating: 4.7
+      }
+    ]
+  },
+  {
+    id: 12,
+    name: "Petra",
+    location: "Jordan",
+    image: "https://media.istockphoto.com/id/1418510499/photo/woman-visiting-petra-ancient-city-in-jordan.webp?a=1&b=1&s=612x612&w=0&k=20&c=l4aNVtxk8udoMhqafak-GlnLx76LBX0u3_jR5Re1_Mw=",
+    rating: 4.8,
+    category: "historical",
+    description: "Ancient city famous for its rock-cut architecture and water conduit system.",
+    price: 1099,
+    duration: "4 days",
+    activities: [
+      "Explore Al-Khazneh (The Treasury)",
+      "Hike to the Monastery",
+      "Camel rides",
+      "Visit Petra Museum"
+    ],
+    weather: "Hot and dry climate",
     bestTime: "March to May, September to November",
     reviews: [
-      { user: "Jennifer P.", comment: "Incredible blend of tradition and technology. Clean and safe.", rating: 5 },
-      { user: "Robert K.", comment: "The food is amazing. Transit system is efficient.", rating: 4.8 }
+      {
+        user: "Layla N.",
+        comment: "Absolutely magical. Like stepping back in time.",
+        rating: 5
+      },
+      {
+        user: "Omar A.",
+        comment: "A must-see wonder! Bring good walking shoes.",
+        rating: 4.6
+      }
+    ]
+  },
+  {
+    id: 13,
+    name: "Bali",
+    location: "Indonesia",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4",
+    rating: 4.8,
+    category: "beach",
+    description: "Known for its forested volcanic mountains, iconic rice paddies, beaches and coral reefs. The island is home to religious sites such as cliffside Uluwatu Temple.",
+    price: 899,
+    duration: "7 days",
+    activities: [
+      "Beach relaxation",
+      "Temple visits",
+      "Water sports",
+      "Cultural shows"
+    ],
+    weather: "Tropical, warm year-round",
+    bestTime: "April to October",
+    reviews: [
+      {
+        user: "Sarah J.",
+        comment: "Beautiful destination. Loved the beaches and temples.",
+        rating: 5
+      },
+      {
+        user: "Mike T.",
+        comment: "Great food and friendly locals. Will definitely return.",
+        rating: 4.5
+      }
     ]
   }
 ];
+
 
 export default function DestinationDetailPage() {
   const { id } = useParams<{ id: string }>();
