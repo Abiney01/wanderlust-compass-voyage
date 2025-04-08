@@ -16,7 +16,7 @@ interface SearchSuggestionsProps {
 }
 
 export function SearchSuggestions({ 
-  placeholder = "Search for places, destinations...", 
+  placeholder = "Search destinations, places...", 
   className = "", 
   onlySearchInExplore = false,
   onSearch
@@ -93,8 +93,15 @@ export function SearchSuggestions({
     setQuery(`${place.name}, ${place.location}`);
     setShowSuggestions(false);
     
-    // Navigate to the destination details page
-    navigate(`/explore/destinations/${place.id}?name=${encodeURIComponent(place.name)}&location=${encodeURIComponent(place.location)}`);
+    // Find matching destination in the available destinations from ExplorePage
+    // We need to make sure we're navigating to a destination that exists
+    try {
+      // Navigate to the explore page with search parameter instead of directly to details
+      // This ensures the user can see results even if exact ID match isn't found
+      navigate(`/explore?search=${encodeURIComponent(place.name)}`);
+    } catch (error) {
+      console.error("Error navigating to destination:", error);
+    }
   };
 
   return (
@@ -107,7 +114,7 @@ export function SearchSuggestions({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={translate('searchPlaceholder') || "Search for places, destinations..."}
+            placeholder={translate('searchPlaceholder') || "Search destinations, places..."}
             className="pl-10 w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
             onFocus={() => query && setShowSuggestions(true)}
           />
@@ -127,7 +134,7 @@ export function SearchSuggestions({
           )}
         </div>
         <Button type="submit" className="ml-2">
-          {translate('search')}
+          Search
         </Button>
       </form>
       
