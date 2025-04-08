@@ -88,7 +88,12 @@ const scheduledTrips = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { userName, formatPrice } = useUserPreferences();
+  const { userName, formatPrice, translate, initializeTranslations } = useUserPreferences();
+
+  useEffect(() => {
+    // Initialize translations when component mounts
+    initializeTranslations();
+  }, [initializeTranslations]);
 
   const handleSearch = (query: string) => {
     if (query) {
@@ -99,13 +104,15 @@ const HomePage = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4 dark:text-white">Welcome to Voyage Vista{userName ? `, ${userName}` : ''}</h1>
+        <h1 className="text-2xl font-bold mb-4 dark:text-white" data-i18n-key="welcome">
+          {translate('welcome')}{userName ? `, ${userName}` : ''}
+        </h1>
       </div>
       
       {/* Adding improved search suggestions component to home page */}
       <div className="mb-8">
         <SearchSuggestions 
-          placeholder="Search destinations, hotels, experiences..." 
+          placeholder={translate('search')} 
           className="max-w-2xl"
           onSearch={handleSearch}
         />
@@ -113,28 +120,28 @@ const HomePage = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
-          title="Total Sales"
+          title={translate('totalSales')}
           value={formatPrice(120900)}
           change={{ value: "12%", positive: true }}
-          subtitle="+$1,900 today"
+          subtitle={`+${formatPrice(1900)} ${translate('today')}`}
         />
         <StatsCard
-          title="Total Orders"
+          title={translate('totalOrders')}
           value="30,000"
           change={{ value: "20%", positive: true }}
-          subtitle="+2,890 today"
+          subtitle={`+2,890 ${translate('today')}`}
         />
         <StatsCard
-          title="Visitor"
+          title={translate('visitor')}
           value="20,000"
           change={{ value: "4%", positive: false }}
-          subtitle="-900 today"
+          subtitle={`-900 ${translate('today')}`}
         />
         <StatsCard
-          title="Refunded"
+          title={translate('refunded')}
           value={formatPrice(3000)}
           change={{ value: "15%", positive: true }}
-          subtitle="today"
+          subtitle={translate('today')}
         />
       </div>
       
@@ -142,6 +149,9 @@ const HomePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Popular Rooms - Taking 2/3 of the width */}
         <div className="lg:col-span-2">
+          <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="popularRooms">
+            {translate('popularRooms')}
+          </h2>
           <PopularRoomsCarousel rooms={popularRooms} />
         </div>
         
@@ -160,7 +170,9 @@ const HomePage = () => {
         
         {/* My Schedule - Taking 1/3 of the width */}
         <div className="dark:bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-lg font-bold mb-4 dark:text-white">My Schedule</h2>
+          <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="mySchedule">
+            {translate('mySchedule')}
+          </h2>
           <div className="space-y-3">
             {scheduledTrips.map(trip => (
               <TripCard

@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/theme-provider";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const { translate } = useUserPreferences();
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    toast.success(`${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} mode activated`);
+    const messageKey = newTheme === "dark" ? "darkMode" : "lightMode";
+    toast.success(`${translate(messageKey)} activated`);
   };
 
   return (
@@ -25,7 +28,7 @@ export function ModeToggle() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Toggle {theme === 'dark' ? 'light' : 'dark'} mode</p>
+          <p>Toggle {theme === 'dark' ? translate('lightMode').toLowerCase() : translate('darkMode').toLowerCase()}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
