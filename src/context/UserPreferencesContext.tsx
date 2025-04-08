@@ -35,6 +35,7 @@ export const translations: Record<Language, Record<string, string>> = {
   English: {
     welcome: 'Welcome to Voyage Vista',
     search: 'Search destinations, hotels, experiences...',
+    searching: 'Searching',
     totalSales: 'Total Sales',
     totalOrders: 'Total Orders',
     visitor: 'Visitor',
@@ -56,6 +57,7 @@ export const translations: Record<Language, Record<string, string>> = {
   Spanish: {
     welcome: 'Bienvenido a Voyage Vista',
     search: 'Buscar destinos, hoteles, experiencias...',
+    searching: 'Buscando',
     totalSales: 'Ventas Totales',
     totalOrders: 'Pedidos Totales',
     visitor: 'Visitante',
@@ -77,6 +79,7 @@ export const translations: Record<Language, Record<string, string>> = {
   French: {
     welcome: 'Bienvenue sur Voyage Vista',
     search: 'Rechercher des destinations, hôtels, expériences...',
+    searching: 'Recherche en cours',
     totalSales: 'Ventes Totales',
     totalOrders: 'Commandes Totales',
     visitor: 'Visiteur',
@@ -98,6 +101,7 @@ export const translations: Record<Language, Record<string, string>> = {
   German: {
     welcome: 'Willkommen bei Voyage Vista',
     search: 'Suche nach Reisezielen, Hotels, Erlebnissen...',
+    searching: 'Suche',
     totalSales: 'Gesamtumsatz',
     totalOrders: 'Gesamtbestellungen',
     visitor: 'Besucher',
@@ -119,6 +123,7 @@ export const translations: Record<Language, Record<string, string>> = {
   Hindi: {
     welcome: 'वॉयेज विस्टा में आपका स्वागत है',
     search: 'गंतव्य, होटल, अनुभव खोजें...',
+    searching: 'खोज रहा है',
     totalSales: 'कुल बिक्री',
     totalOrders: 'कुल आदेश',
     visitor: 'आगंतुक',
@@ -140,6 +145,7 @@ export const translations: Record<Language, Record<string, string>> = {
   Japanese: {
     welcome: 'ボヤージュビスタへようこそ',
     search: '目的地、ホテル、体験を検索...',
+    searching: '検索中',
     totalSales: '総売上高',
     totalOrders: '総注文数',
     visitor: '訪問者',

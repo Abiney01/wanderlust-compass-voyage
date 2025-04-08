@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin } from "lucide-react";
@@ -41,7 +42,9 @@ export function SearchSuggestions({
       try {
         const results = await searchPlaces(debouncedQuery);
         setSuggestions(results);
-        setShowSuggestions(true);
+        if (results.length > 0) {
+          setShowSuggestions(true);
+        }
       } catch (error) {
         console.error("Error fetching places:", error);
       } finally {
@@ -90,6 +93,7 @@ export function SearchSuggestions({
     setQuery(`${place.name}, ${place.location}`);
     setShowSuggestions(false);
     
+    // Navigate to the destination details page
     navigate(`/explore/destinations/${place.id}?name=${encodeURIComponent(place.name)}&location=${encodeURIComponent(place.location)}`);
   };
 
@@ -114,20 +118,22 @@ export function SearchSuggestions({
               onClick={() => {
                 setQuery('');
                 inputRef.current?.focus();
+                setSuggestions([]);
               }}
+              aria-label="Clear search"
             >
               ×
             </button>
           )}
         </div>
         <Button type="submit" className="ml-2">
-          Search
+          {translate('search')}
         </Button>
       </form>
       
       {isLoading && (
         <div className="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 p-4 text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-          Searching...
+          {translate('searching')}...
         </div>
       )}
       

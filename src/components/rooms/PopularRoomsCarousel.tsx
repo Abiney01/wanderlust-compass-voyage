@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RoomCard } from "@/components/rooms/RoomCard";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 interface Room {
   id: number;
@@ -19,6 +20,7 @@ interface PopularRoomsCarouselProps {
 
 export function PopularRoomsCarousel({ rooms }: PopularRoomsCarouselProps) {
   const navigate = useNavigate();
+  const { translate } = useUserPreferences();
   const [startIndex, setStartIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const itemsPerPage = 3;
@@ -68,7 +70,8 @@ export function PopularRoomsCarousel({ rooms }: PopularRoomsCarouselProps) {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Popular Rooms</h2>
+        {/* Removed duplicate heading here, as it's already in the parent component */}
+        <div className="flex-grow"></div>
         <div className="flex gap-2">
           <button 
             className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600 transition-all transform hover:scale-105"

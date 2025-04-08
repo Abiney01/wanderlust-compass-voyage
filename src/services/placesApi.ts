@@ -2,7 +2,7 @@
 import { toast } from 'sonner';
 
 // OpenCage API configuration
-const API_KEY = 'YOUR_OPENCAGE_API_KEY'; // Replace with your OpenCage API key
+const API_KEY = 'YOUR_OPENCAGE_API_KEY'; // This should be replaced with a real API key
 const BASE_URL = 'https://api.opencagedata.com/geocode/v1/json';
 
 export interface PlaceResult {
@@ -76,9 +76,61 @@ const determinePlaceType = (components: any): string => {
   return 'Destination';
 };
 
-// Search for places using OpenCage API
+// For demo purposes - mock data when API key is not provided
+const mockPlaces: PlaceResult[] = [
+  {
+    id: 'place-1',
+    name: 'Paris',
+    location: 'France',
+    type: 'City',
+    coordinates: { lat: 48.8566, lng: 2.3522 },
+    country: 'France',
+    description: 'Explore Paris in France!'
+  },
+  {
+    id: 'place-2',
+    name: 'London',
+    location: 'United Kingdom',
+    type: 'City',
+    coordinates: { lat: 51.5074, lng: -0.1278 },
+    country: 'United Kingdom',
+    description: 'Explore London in United Kingdom!'
+  },
+  {
+    id: 'place-3',
+    name: 'Rome',
+    location: 'Italy',
+    type: 'Historical',
+    coordinates: { lat: 41.9028, lng: 12.4964 },
+    country: 'Italy',
+    description: 'Explore Rome in Italy!'
+  },
+  {
+    id: 'place-4',
+    name: 'Bali',
+    location: 'Indonesia',
+    type: 'Beach',
+    coordinates: { lat: -8.4095, lng: 115.1889 },
+    country: 'Indonesia',
+    description: 'Explore Bali in Indonesia!'
+  }
+];
+
+// Search for places using OpenCage API or fallback to mock data
 export const searchPlaces = async (query: string): Promise<PlaceResult[]> => {
   try {
+    // If API_KEY is not set (or equals to placeholder), use mock data
+    if (!API_KEY || API_KEY === 'YOUR_OPENCAGE_API_KEY') {
+      console.log('Using mock data for place search (no API key provided)');
+      
+      // Filter mock data based on search query
+      return mockPlaces.filter(place => 
+        place.name.toLowerCase().includes(query.toLowerCase()) || 
+        place.location.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    
+    // With valid API key, make real API call
     const response = await fetch(
       `${BASE_URL}?q=${encodeURIComponent(query)}&key=${API_KEY}&limit=10&no_annotations=0`
     );
@@ -136,6 +188,19 @@ export const searchPlaces = async (query: string): Promise<PlaceResult[]> => {
 // Get detailed information about a specific place
 export const getPlaceDetails = async (placeId: string, placeName: string): Promise<PlaceResult | null> => {
   try {
+    // If API_KEY is not set (or equals to placeholder), use mock data
+    if (!API_KEY || API_KEY === 'YOUR_OPENCAGE_API_KEY') {
+      console.log('Using mock data for place details (no API key provided)');
+      
+      // Find matching place in mock data
+      const mockPlace = mockPlaces.find(place => 
+        place.name.toLowerCase() === placeName.toLowerCase() || 
+        place.id === placeId
+      );
+      
+      return mockPlace || null;
+    }
+    
     const response = await fetch(
       `${BASE_URL}?q=${encodeURIComponent(placeName)}&key=${API_KEY}&no_annotations=0`
     );
