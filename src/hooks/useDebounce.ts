@@ -11,6 +11,7 @@ export function useDebounce<T>(value: T, delay: number): T {
     }, delay);
 
     // Clean up the timeout if the value changes before the delay has passed
+    // or if the component unmounts
     return () => {
       clearTimeout(timer);
     };

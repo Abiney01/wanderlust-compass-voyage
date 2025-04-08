@@ -112,7 +112,7 @@ const HomePage = () => {
       {/* Adding improved search suggestions component to home page */}
       <div className="mb-8">
         <SearchSuggestions 
-          placeholder={translate('search')} 
+          placeholder={translate('searchPlaceholder') || "Search destinations..."} 
           className="max-w-2xl"
           onSearch={handleSearch}
         />
