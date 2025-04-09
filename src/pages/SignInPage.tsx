@@ -7,6 +7,22 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
+// Mock user database (in a real app, this would be in a backend)
+const mockUsers = [
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    password: "password123" // In a real app, this would be hashed
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    password: "securepass" // In a real app, this would be hashed
+  }
+];
+
 const SignInPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("signin");
@@ -15,22 +31,34 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     
-    // Simulate authentication
+    // Find user by email
+    const user = mockUsers.find(user => user.email === email);
+    
     setTimeout(() => {
-      // In a real app, this would call an API
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("user", JSON.stringify({
-        name: "John Doe",
-        email: email,
-      }));
-      
-      toast.success("Successfully signed in!");
-      navigate("/");
+      if (user && user.password === password) {
+        // Authentication successful
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("user", JSON.stringify({
+          name: user.name,
+          email: user.email,
+        }));
+        
+        toast.success("Successfully signed in!");
+        navigate("/");
+      } else {
+        // Authentication failed
+        setError("Invalid email or password");
+        toast.error("Authentication failed", {
+          description: "Please check your email and password"
+        });
+      }
       setLoading(false);
     }, 1000);
   };
@@ -38,13 +66,29 @@ const SignInPage = () => {
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     
-    // Simulate registration
+    // Check if email is already in use
+    const userExists = mockUsers.some(user => user.email === email);
+    
     setTimeout(() => {
-      toast.success("Account created successfully!", {
-        description: "Please sign in with your new account."
-      });
-      setActiveTab("signin");
+      if (userExists) {
+        setError("Email is already in use");
+        toast.error("Registration failed", {
+          description: "Email is already in use"
+        });
+      } else if (password.length < 8) {
+        setError("Password must be at least 8 characters long");
+        toast.error("Registration failed", {
+          description: "Password must be at least 8 characters long"
+        });
+      } else {
+        // In a real app, this would add the user to the database
+        toast.success("Account created successfully!", {
+          description: "Please sign in with your new account."
+        });
+        setActiveTab("signin");
+      }
       setLoading(false);
     }, 1000);
   };
@@ -120,6 +164,12 @@ const SignInPage = () => {
                 <p className="text-gray-500">Sign in to your account</p>
               </div>
               
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+                  {error}
+                </div>
+              )}
+              
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -155,6 +205,10 @@ const SignInPage = () => {
                 >
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
+                <div className="text-sm text-center mt-2 text-blue-600">
+                  <p>Demo Credentials:</p>
+                  <p>Email: john@example.com | Password: password123</p>
+                </div>
               </form>
               
               <div className="relative my-6">
@@ -190,6 +244,12 @@ const SignInPage = () => {
                 <h2 className="text-2xl font-bold">Create your account</h2>
                 <p className="text-gray-500">Join Voyage Vista today</p>
               </div>
+              
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+                  {error}
+                </div>
+              )}
               
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">

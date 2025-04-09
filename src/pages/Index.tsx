@@ -15,7 +15,7 @@ const Index = () => {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Voyage Vista</h1>
           </div>
-          <Button variant="outline" onClick={() => navigate("/")}>
+          <Button variant="outline" onClick={() => navigate("/signin")}>
             Sign In
           </Button>
         </header>
