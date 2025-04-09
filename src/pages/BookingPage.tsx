@@ -67,7 +67,7 @@ const allDestinations = [
     location: "Arizona, USA",
     type: "Nature",
     price: 899,
-    image: "https://images.unsplash.com/photo-1575407371544-9d386af95330"
+    image: "https://images.unsplash.com/photo-1615551043360-33de8b5f410c"
   }
 ];
 
