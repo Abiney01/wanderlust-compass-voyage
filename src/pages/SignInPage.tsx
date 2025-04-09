@@ -168,26 +168,24 @@ const SignInPage = () => {
       {/* Right side - Sign in/sign up form */}
       <div className="w-full lg:w-1/2 bg-gray-900 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          <div className="w-full flex justify-between mb-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger 
-                value="signin" 
-                onClick={() => setActiveTab("signin")}
-                className={activeTab === "signin" ? "text-white bg-gray-800" : "text-gray-400"}
-              >
-                Sign In
-              </TabsTrigger>
-              <TabsTrigger 
-                value="signup" 
-                onClick={() => setActiveTab("signup")}
-                className={activeTab === "signup" ? "text-white bg-gray-800" : "text-gray-400"}
-              >
-                Sign Up
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "signin" | "signup")} className="w-full">
+            <div className="w-full flex justify-between mb-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger 
+                  value="signin" 
+                  className={activeTab === "signin" ? "text-white bg-gray-800" : "text-gray-400"}
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup" 
+                  className={activeTab === "signup" ? "text-white bg-gray-800" : "text-gray-400"}
+                >
+                  Sign Up
+                </TabsTrigger>
+              </TabsList>
+            </div>
           
-          <Tabs value={activeTab} className="w-full">
             <TabsContent value="signin">
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-white mb-1">Welcome back</h2>
