@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 interface RoomCardProps {
   image: string;
@@ -14,6 +15,7 @@ interface RoomCardProps {
 
 export function RoomCard({ image, title, location, price, className, onClick }: RoomCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { formatPrice } = useUserPreferences();
   
   return (
     <div 
@@ -35,7 +37,7 @@ export function RoomCard({ image, title, location, price, className, onClick }: 
           )}
         />
         <div className="absolute top-3 right-3 bg-blue-500 text-white px-2 py-1 rounded-md font-medium">
-          ${price}
+          {formatPrice(price)}
         </div>
       </div>
       <div className="p-4">
