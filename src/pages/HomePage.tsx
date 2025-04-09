@@ -5,7 +5,7 @@ import { Calendar } from "@/components/calendar/Calendar";
 import { TripCard } from "@/components/trips/TripCard";
 import { BookingChart } from "@/components/dashboard/BookingChart";
 import { PopularRoomsCarousel } from "@/components/rooms/PopularRoomsCarousel";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 import { useNavigate } from "react-router-dom";
 import { useUserPreferences } from "@/context/UserPreferencesContext";
@@ -89,10 +89,12 @@ const scheduledTrips = [
 const HomePage = () => {
   const navigate = useNavigate();
   const { userName, formatPrice, translate, initializeTranslations } = useUserPreferences();
+  const [translationsReady, setTranslationsReady] = useState(false);
 
   useEffect(() => {
     // Initialize translations when component mounts
     initializeTranslations();
+    setTranslationsReady(true);
   }, [initializeTranslations]);
 
   const handleSearch = (query: string) => {
@@ -101,18 +103,26 @@ const HomePage = () => {
     }
   };
 
+  // Use default strings as fallbacks when translations aren't loaded
+  const getTranslation = (key: string, fallback: string): string => {
+    if (!translationsReady) {
+      return fallback;
+    }
+    return translate(key) || fallback;
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4 dark:text-white" data-i18n-key="welcome">
-          {translate('welcome')}{userName ? `, ${userName}` : ''}
+          {getTranslation('welcome', 'Welcome to Voyage Vista')}{userName ? `, ${userName}` : ''}
         </h1>
       </div>
       
       {/* Improved search suggestions component with updated placeholder */}
       <div className="mb-8">
         <SearchSuggestions 
-          placeholder={translate('searchPlaceholder') || "Search for places, destinations..."}
+          placeholder={getTranslation('search', 'Search destinations, places...')}
           className="max-w-2xl"
           onSearch={handleSearch}
         />
@@ -120,28 +130,28 @@ const HomePage = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
-          title={translate('totalSales')}
+          title={getTranslation('totalSales', 'Total Sales')}
           value={formatPrice(120900)}
           change={{ value: "12%", positive: true }}
-          subtitle={`+${formatPrice(1900)} ${translate('today')}`}
+          subtitle={`+${formatPrice(1900)} ${getTranslation('today', 'today')}`}
         />
         <StatsCard
-          title={translate('totalOrders')}
+          title={getTranslation('totalOrders', 'Total Orders')}
           value="30,000"
           change={{ value: "20%", positive: true }}
-          subtitle={`+2,890 ${translate('today')}`}
+          subtitle={`+2,890 ${getTranslation('today', 'today')}`}
         />
         <StatsCard
-          title={translate('visitor')}
+          title={getTranslation('visitor', 'Visitor')}
           value="20,000"
           change={{ value: "4%", positive: false }}
-          subtitle={`-900 ${translate('today')}`}
+          subtitle={`-900 ${getTranslation('today', 'today')}`}
         />
         <StatsCard
-          title={translate('refunded')}
+          title={getTranslation('refunded', 'Refunded')}
           value={formatPrice(3000)}
           change={{ value: "15%", positive: true }}
-          subtitle={translate('today')}
+          subtitle={getTranslation('today', 'today')}
         />
       </div>
       
@@ -150,7 +160,7 @@ const HomePage = () => {
         {/* Popular Rooms - Taking 2/3 of the width */}
         <div className="lg:col-span-2">
           <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="popularRooms">
-            {translate('popularRooms')}
+            {getTranslation('popularRooms', 'Popular Rooms')}
           </h2>
           <PopularRoomsCarousel rooms={popularRooms} />
         </div>
@@ -171,7 +181,7 @@ const HomePage = () => {
         {/* My Schedule - Taking 1/3 of the width */}
         <div className="dark:bg-gray-800 p-4 rounded-lg">
           <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="mySchedule">
-            {translate('mySchedule')}
+            {getTranslation('mySchedule', 'My Schedule')}
           </h2>
           <div className="space-y-3">
             {scheduledTrips.map(trip => (
