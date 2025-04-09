@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -326,12 +325,6 @@ const SignInPage = () => {
               </form>
             </TabsContent>
           </Tabs>
-          
-          <div className="mt-6 text-center">
-            <Button variant="link" onClick={() => navigate("/")} className="text-gray-400 hover:text-gray-300">
-              Back to Home
-            </Button>
-          </div>
         </div>
       </div>
       
