@@ -10,11 +10,32 @@ export function ModeToggle() {
   const { theme, setTheme } = useTheme();
   const { translate } = useUserPreferences();
 
+  // Safe translation function that provides fallbacks
+  const safeTranslate = (key: string): string => {
+    try {
+      const translated = translate(key);
+      // If translation returns undefined or the key itself, use fallback
+      return translated && translated !== key ? translated : getFallbackTranslation(key);
+    } catch (error) {
+      console.error("Translation error:", error);
+      return getFallbackTranslation(key);
+    }
+  };
+
+  // Fallback translations for critical UI elements
+  const getFallbackTranslation = (key: string): string => {
+    const fallbacks: Record<string, string> = {
+      darkMode: "Dark Mode",
+      lightMode: "Light Mode"
+    };
+    return fallbacks[key] || key;
+  };
+
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     const messageKey = newTheme === "dark" ? "darkMode" : "lightMode";
-    toast.success(`${translate(messageKey)} activated`);
+    toast.success(`${safeTranslate(messageKey)} activated`);
   };
 
   return (
@@ -28,7 +49,7 @@ export function ModeToggle() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Toggle {theme === 'dark' ? translate('lightMode').toLowerCase() : translate('darkMode').toLowerCase()}</p>
+          <p>Toggle {theme === 'dark' ? safeTranslate('lightMode').toLowerCase() : safeTranslate('darkMode').toLowerCase()}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
