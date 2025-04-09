@@ -1,9 +1,31 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if (isAuthenticated === "true") {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        setUserName(user.name);
+        setIsLoggedIn(true);
+      }
+    }
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUserName("");
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -15,9 +37,18 @@ const Index = () => {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Voyage Vista</h1>
           </div>
-          <Button variant="outline" onClick={() => navigate("/signin")}>
-            Sign In
-          </Button>
+          {isLoggedIn ? (
+            <div className="flex items-center gap-4">
+              <span className="text-gray-700">Welcome, {userName}</span>
+              <Button variant="outline" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" onClick={() => navigate("/signin")}>
+              Sign In
+            </Button>
+          )}
         </header>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

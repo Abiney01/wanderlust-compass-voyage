@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
-// Mock user database (in a real app, this would be in a backend)
-const mockUsers = [
+// Initial mock users
+const initialMockUsers = [
   {
     id: 1,
     name: "John Doe",
@@ -32,14 +32,23 @@ const SignInPage = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [users, setUsers] = useState(initialMockUsers);
+  
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const storedUsers = localStorage.getItem("registeredUsers");
+    if (storedUsers) {
+      setUsers([...initialMockUsers, ...JSON.parse(storedUsers)]);
+    }
+  }, []);
   
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     
-    // Find user by email
-    const user = mockUsers.find(user => user.email === email);
+    // Check both initial mock users and registered users from localStorage
+    const user = users.find(user => user.email === email);
     
     setTimeout(() => {
       if (user && user.password === password) {
@@ -69,7 +78,7 @@ const SignInPage = () => {
     setError("");
     
     // Check if email is already in use
-    const userExists = mockUsers.some(user => user.email === email);
+    const userExists = users.some(user => user.email === email);
     
     setTimeout(() => {
       if (userExists) {
@@ -82,11 +91,38 @@ const SignInPage = () => {
         toast.error("Registration failed", {
           description: "Password must be at least 8 characters long"
         });
+      } else if (!name.trim()) {
+        setError("Name is required");
+        toast.error("Registration failed", {
+          description: "Please enter your name"
+        });
       } else {
-        // In a real app, this would add the user to the database
+        // Create new user
+        const newUser = {
+          id: users.length + 1,
+          name,
+          email,
+          password
+        };
+        
+        // Add user to state
+        const updatedUsers = [...users, newUser];
+        setUsers(updatedUsers);
+        
+        // Store registered users in localStorage (excluding the initial mock users)
+        const registeredUsers = updatedUsers.filter(
+          u => !initialMockUsers.some(mockUser => mockUser.id === u.id)
+        );
+        localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
+        
         toast.success("Account created successfully!", {
           description: "Please sign in with your new account."
         });
+        
+        // Clear form and switch to sign in tab
+        setName("");
+        setEmail("");
+        setPassword("");
         setActiveTab("signin");
       }
       setLoading(false);
