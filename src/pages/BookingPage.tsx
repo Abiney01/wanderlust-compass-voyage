@@ -50,7 +50,7 @@ const popularDestinations = [
 // Get all destination details including from search component
 const allDestinations = [
   { id: 13, name: "Bali", location: "Indonesia", type: "Beach", price: 899, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4" },
-  { id: 2, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1543349689-9a4d426bee8e" },
+  { id: 2, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1439393161192-32360eb753f1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZWlmZmVsJTIwdG93ZXJ8ZW58MHx8MHx8fDA%3D" },
   { id: 4, name: "Kyoto Temples", location: "Kyoto, Japan", type: "Cultural", price: 1399, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" },
   { id: 3, name: "Bora Bora", location: "French Polynesia", type: "Beach", price: 2199, image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46" },
   { id: 5, name: "Northern Lights", location: "Iceland", type: "Nature", price: 1799, image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7" },
