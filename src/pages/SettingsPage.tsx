@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/Dashboard";
 import { Input } from "@/components/ui/input";
@@ -24,12 +25,10 @@ const SettingsPage = () => {
   
   const [avatarUrl, setAvatarUrl] = useState(userAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80");
   
-  const [notifications, setNotifications] = useState({
-    marketing: true,
-    socialUpdates: false,
-    securityAlerts: true,
-    promotionalOffers: true
-  });
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,11 +56,56 @@ const SettingsPage = () => {
     }
   };
 
-  const handleNotificationChange = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+  const handlePasswordUpdate = () => {
+    // Validate inputs
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    
+    // Get the current user
+    const currentUserStr = localStorage.getItem("user");
+    if (!currentUserStr) {
+      toast.error("You are not logged in");
+      return;
+    }
+    
+    const currentUser = JSON.parse(currentUserStr);
+    
+    // Get all users
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const userIndex = users.findIndex((u: any) => u.id === currentUser.id);
+    
+    if (userIndex === -1) {
+      toast.error("User not found");
+      return;
+    }
+    
+    // Check if the current password is correct
+    if (users[userIndex].password !== currentPassword) {
+      toast.error("Current password is incorrect");
+      return;
+    }
+    
+    // Update the password
+    users[userIndex].password = newPassword;
+    localStorage.setItem("users", JSON.stringify(users));
+    
+    // Also update the current user in localStorage
+    currentUser.password = newPassword;
+    localStorage.setItem("user", JSON.stringify(currentUser));
+    
+    // Clear the form
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    
+    toast.success("Password updated successfully");
   };
 
   useEffect(() => {
@@ -79,10 +123,9 @@ const SettingsPage = () => {
         </div>
         
         <Tabs defaultValue="profile" className="space-y-4">
-          <TabsList className="grid grid-cols-4 md:w-[600px] dark:bg-gray-800">
+          <TabsList className="grid grid-cols-3 md:w-[600px] dark:bg-gray-800">
             <TabsTrigger value="profile" className="dark:data-[state=active]:bg-gray-700">Profile</TabsTrigger>
             <TabsTrigger value="preferences" className="dark:data-[state=active]:bg-gray-700">Preferences</TabsTrigger>
-            <TabsTrigger value="notifications" className="dark:data-[state=active]:bg-gray-700">Notifications</TabsTrigger>
             <TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger>
           </TabsList>
           
@@ -255,71 +298,6 @@ const SettingsPage = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="notifications">
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="flex items-center dark:text-white">
-                  <Bell className="mr-2 h-5 w-5" /> Notification Settings
-                </CardTitle>
-                <CardDescription className="dark:text-gray-400">
-                  Configure how you want to be notified
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium dark:text-white">Marketing Emails</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive emails about new features and promotions</p>
-                  </div>
-                  <Switch 
-                    checked={notifications.marketing} 
-                    onCheckedChange={() => handleNotificationChange('marketing')}
-                    className="dark:bg-gray-700"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium dark:text-white">Social Updates</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive notifications about your network</p>
-                  </div>
-                  <Switch 
-                    checked={notifications.socialUpdates} 
-                    onCheckedChange={() => handleNotificationChange('socialUpdates')}
-                    className="dark:bg-gray-700"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium dark:text-white">Security Alerts</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Get notified about account security events</p>
-                  </div>
-                  <Switch 
-                    checked={notifications.securityAlerts} 
-                    onCheckedChange={() => handleNotificationChange('securityAlerts')}
-                    className="dark:bg-gray-700"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium dark:text-white">Promotional Offers</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive special offers and discounts</p>
-                  </div>
-                  <Switch 
-                    checked={notifications.promotionalOffers} 
-                    onCheckedChange={() => handleNotificationChange('promotionalOffers')}
-                    className="dark:bg-gray-700"
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={() => toast.success("Notification preferences saved")}>Save Preferences</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
           <TabsContent value="security">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
@@ -335,6 +313,8 @@ const SettingsPage = () => {
                     id="current-password" 
                     type="password" 
                     placeholder="Enter your current password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
@@ -345,6 +325,8 @@ const SettingsPage = () => {
                     id="new-password" 
                     type="password" 
                     placeholder="Enter your new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
@@ -355,6 +337,8 @@ const SettingsPage = () => {
                     id="confirm-password" 
                     type="password" 
                     placeholder="Confirm your new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
@@ -380,7 +364,7 @@ const SettingsPage = () => {
               </CardContent>
               <CardFooter>
                 <Button 
-                  onClick={() => toast.success("Password updated successfully. Please log in again.")}
+                  onClick={handlePasswordUpdate}
                   className="mr-2"
                 >
                   Update Password

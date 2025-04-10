@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -118,15 +119,101 @@ const SignInPage = () => {
     // For now, just show a success message
     setPasswordResetSent(true);
     
-    // In a real app, we would generate a reset token and store it
-    // Here we'll simulate that by adding a resetToken to the user
-    user.resetToken = Math.random().toString(36).substring(2, 15);
+    // Generate a reset token
+    const resetToken = Math.random().toString(36).substring(2, 15);
+    
+    // Save the reset token to the user object
+    user.resetToken = resetToken;
     localStorage.setItem("users", JSON.stringify(users));
     
+    // In a real app, we would send an email with a link containing the reset token
+    // For this demo, we'll simulate sending an email by logging to console
+    console.log(`Password reset link for ${forgotPasswordEmail}: /reset-password?token=${resetToken}&email=${encodeURIComponent(forgotPasswordEmail)}`);
+    
+    // After 3 seconds, close the dialog and reset state
     setTimeout(() => {
       setForgotPasswordOpen(false);
       setPasswordResetSent(false);
       setForgotPasswordEmail("");
+      
+      // Show a reset link dialog for demonstration purposes
+      const resetUrl = `/reset-password?token=${resetToken}&email=${encodeURIComponent(forgotPasswordEmail)}`;
+      toast.info(
+        <div>
+          <p>For demo purposes, use this link to reset your password:</p>
+          <button 
+            className="text-blue-500 underline"
+            onClick={() => {
+              // Create temporary password reset page in memory
+              const resetForm = document.createElement("div");
+              resetForm.innerHTML = `
+                <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h2 class="text-xl font-bold mb-4 dark:text-white">Reset Password</h2>
+                    <div class="space-y-4">
+                      <div>
+                        <label class="block text-sm font-medium mb-1 dark:text-white">New Password</label>
+                        <input type="password" id="new-pwd" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" />
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium mb-1 dark:text-white">Confirm New Password</label>
+                        <input type="password" id="confirm-pwd" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" />
+                      </div>
+                      <div class="flex justify-end space-x-2 mt-4">
+                        <button id="cancel-reset" class="px-4 py-2 border rounded">Cancel</button>
+                        <button id="submit-reset" class="px-4 py-2 bg-blue-500 text-white rounded">Reset Password</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(resetForm);
+              
+              // Add event listeners
+              document.getElementById("cancel-reset")?.addEventListener("click", () => {
+                document.body.removeChild(resetForm);
+              });
+              
+              document.getElementById("submit-reset")?.addEventListener("click", () => {
+                const newPassword = (document.getElementById("new-pwd") as HTMLInputElement)?.value;
+                const confirmPassword = (document.getElementById("confirm-pwd") as HTMLInputElement)?.value;
+                
+                if (!newPassword || !confirmPassword) {
+                  toast.error("Please fill in all fields");
+                  return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                  toast.error("Passwords do not match");
+                  return;
+                }
+                
+                // Update user's password
+                const users = JSON.parse(localStorage.getItem("users") || "[]");
+                const userIndex = users.findIndex((u: any) => u.email === forgotPasswordEmail && u.resetToken === resetToken);
+                
+                if (userIndex === -1) {
+                  toast.error("Invalid or expired reset link");
+                  return;
+                }
+                
+                users[userIndex].password = newPassword;
+                users[userIndex].resetToken = null; // Clear the reset token
+                localStorage.setItem("users", JSON.stringify(users));
+                
+                toast.success("Password has been reset successfully!");
+                document.body.removeChild(resetForm);
+                
+                // Redirect to login
+                setActiveTab("signin");
+              });
+            }}
+          >
+            Click to reset password
+          </button>
+        </div>,
+        { duration: 10000 }
+      );
     }, 3000);
   };
 
@@ -232,37 +319,6 @@ const SignInPage = () => {
                   Sign In
                 </Button>
               </form>
-              
-              <div className="mt-8">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-700"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 text-gray-500 bg-gray-900">Or continue with</span>
-                  </div>
-                </div>
-                
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <circle cx="12" cy="12" r="4"></circle>
-                      <line x1="21.17" y1="8" x2="12" y2="8"></line>
-                      <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
-                      <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
-                    </svg>
-                    Google
-                  </Button>
-                  
-                  <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                    </svg>
-                    Facebook
-                  </Button>
-                </div>
-              </div>
             </TabsContent>
             
             <TabsContent value="signup">
