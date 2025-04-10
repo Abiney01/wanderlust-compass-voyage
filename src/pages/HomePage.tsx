@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/layout/Dashboard";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { Calendar } from "@/components/calendar/Calendar";
@@ -10,7 +9,6 @@ import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 import { useNavigate } from "react-router-dom";
 import { useUserPreferences } from "@/context/UserPreferencesContext";
 
-// Expanded popular rooms data with fallback images
 const popularRooms = [
   {
     id: 1,
@@ -62,7 +60,7 @@ const popularRooms = [
   }
 ];
 
-const scheduledTrips = [
+const defaultTrips = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?auto=format&fit=crop&w=600&h=350",
@@ -90,41 +88,15 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { userName, formatPrice, translate, initializeTranslations } = useUserPreferences();
   const [translationsReady, setTranslationsReady] = useState(false);
-  const [scheduledTrips, setScheduledTrips] = useState([
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?auto=format&fit=crop&w=600&h=350",
-      fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-      title: "Aling Waterfall",
-      date: "01-04 July 2022"
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1601581875039-e899893d520c?auto=format&fit=crop&w=600&h=350",
-      fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-      title: "Prager Wildsee",
-      date: "12-19 July 2022"
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1502636621341-4846e29a3496?auto=format&fit=crop&w=600&h=350",
-      fallbackImage: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=600&h=350",
-      title: "Grouste Vista",
-      date: "07-12 August 2022"
-    }
-  ]);
+  const [scheduledTrips, setScheduledTrips] = useState(defaultTrips);
 
   useEffect(() => {
-    // Initialize translations when component mounts
     initializeTranslations();
     setTranslationsReady(true);
     
-    // Load saved bookings from localStorage
-    const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    if (savedBookings.length > 0) {
-      // Combine with default trips or replace them based on your preference
-      setScheduledTrips(prevTrips => {
-        // Convert saved bookings to the format expected by TripCard
+    const loadBookings = () => {
+      const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+      if (savedBookings.length > 0) {
         const bookingTrips = savedBookings.map((booking: any) => ({
           id: booking.id || Date.now() + Math.random(),
           image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
@@ -133,11 +105,42 @@ const HomePage = () => {
           date: booking.date || new Date().toLocaleDateString()
         }));
         
-        // Return a mix of existing and new bookings
-        return [...bookingTrips, ...prevTrips].slice(0, 5); // Keep only 5 most recent
-      });
-    }
+        setScheduledTrips([...bookingTrips, ...defaultTrips].slice(0, 5));
+      }
+    };
+
+    loadBookings();
+
+    window.addEventListener('storage', loadBookings);
+    window.addEventListener('bookingUpdated', loadBookings);
+    
+    return () => {
+      window.removeEventListener('storage', loadBookings);
+      window.removeEventListener('bookingUpdated', loadBookings);
+    };
   }, [initializeTranslations]);
+
+  useEffect(() => {
+    const checkForBookingUpdates = () => {
+      const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+      if (savedBookings.length > 0) {
+        const bookingTrips = savedBookings.map((booking: any) => ({
+          id: booking.id || Date.now() + Math.random(),
+          image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+          fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+          title: booking.title || booking.destination || "New Booking",
+          date: booking.date || new Date().toLocaleDateString()
+        }));
+        
+        setScheduledTrips([...bookingTrips, ...defaultTrips].slice(0, 5));
+      }
+    };
+    
+    checkForBookingUpdates();
+    const interval = setInterval(checkForBookingUpdates, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSearch = (query: string) => {
     if (query) {
@@ -145,7 +148,6 @@ const HomePage = () => {
     }
   };
 
-  // Use default strings as fallbacks when translations aren't loaded
   const getTranslation = (key: string, fallback: string): string => {
     if (!translationsReady) {
       return fallback;
@@ -161,7 +163,6 @@ const HomePage = () => {
         </h1>
       </div>
       
-      {/* Improved search suggestions component with updated placeholder */}
       <div className="mb-8">
         <SearchSuggestions 
           placeholder={getTranslation('search', 'Search destinations, places...')}
@@ -197,9 +198,7 @@ const HomePage = () => {
         />
       </div>
       
-      {/* Popular Rooms and Calendar Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Popular Rooms - Taking 2/3 of the width */}
         <div className="lg:col-span-2">
           <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="popularRooms">
             {getTranslation('popularRooms', 'Popular Rooms')}
@@ -207,34 +206,36 @@ const HomePage = () => {
           <PopularRoomsCarousel rooms={popularRooms} />
         </div>
         
-        {/* Calendar - Taking 1/3 of the width */}
         <div className="dark:bg-gray-800 dark:text-white rounded-lg p-2">
           <Calendar />
         </div>
       </div>
       
-      {/* Booking Stats and My Schedule Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Booking Chart - Taking 2/3 of the width */}
         <div className="lg:col-span-2 dark:bg-gray-800 dark:text-white p-4 rounded-lg">
           <BookingChart className="animate-fade-in" />
         </div>
         
-        {/* My Schedule - Taking 1/3 of the width */}
         <div className="dark:bg-gray-800 p-4 rounded-lg">
           <h2 className="text-lg font-bold mb-4 dark:text-white" data-i18n-key="mySchedule">
             {getTranslation('mySchedule', 'My Schedule')}
           </h2>
           <div className="space-y-3">
-            {scheduledTrips.map(trip => (
-              <TripCard
-                key={trip.id}
-                image={trip.image}
-                fallbackImage={trip.fallbackImage}
-                title={trip.title}
-                date={trip.date}
-              />
-            ))}
+            {scheduledTrips.length > 0 ? (
+              scheduledTrips.map(trip => (
+                <TripCard
+                  key={trip.id}
+                  image={trip.image}
+                  fallbackImage={trip.fallbackImage}
+                  title={trip.title}
+                  date={trip.date}
+                />
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                No scheduled trips yet
+              </div>
+            )}
           </div>
         </div>
       </div>

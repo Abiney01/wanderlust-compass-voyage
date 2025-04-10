@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/Dashboard";
@@ -19,6 +18,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUserPreferences } from "@/context/UserPreferencesContext";
+import { 
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const popularDestinations = [
   {
@@ -47,14 +55,13 @@ const popularDestinations = [
   }
 ];
 
-// Get all destination details including from search component
 const allDestinations = [
   { id: 13, name: "Bali", location: "Indonesia", type: "Beach", price: 899, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4" },
   { id: 2, name: "Eiffel Tower", location: "Paris, France", type: "Landmark", price: 1299, image: "https://images.unsplash.com/photo-1439393161192-32360eb753f1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZWlmZmVsJTIwdG93ZXJ8ZW58MHx8MHx8fDA%3D" },
   { id: 4, name: "Kyoto Temples", location: "Kyoto, Japan", type: "Cultural", price: 1399, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" },
   { id: 3, name: "Bora Bora", location: "French Polynesia", type: "Beach", price: 2199, image: "https://images.unsplash.com/photo-1501446529957-6226bd447c46" },
   { id: 5, name: "Northern Lights", location: "Iceland", type: "Nature", price: 1799, image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7" },
-  { id: 6, name: "Colosseum", location: "Rome, Italy", type: "Landmark", price: 1099, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5" },
+  { id: 6, name: "Colosseum", location: "Rome, Italy", type: "Landmark", price: 1099, image: "https://images.unsplash.com/photo-1564507592333-c60657eea523" },
   { id: 7, name: "Great Barrier Reef", location: "Queensland, Australia", type: "Beach", price: 1699, image: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5" },
   { id: 8, name: "Machu Picchu", location: "Cusco, Peru", type: "Cultural", price: 1599, image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1" },
   { id: 9, name: "Santorini", location: "Greece", type: "Beach", price: 1099, image: "https://images.unsplash.com/photo-1533105079780-92b9be482077" },
@@ -84,8 +91,8 @@ const BookingPage = () => {
   const [isBookingComplete, setIsBookingComplete] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [bookedDestinations, setBookedDestinations] = useState<any[]>([]);
   
-  // Parse URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const destParam = params.get("destination");
@@ -94,7 +101,6 @@ const BookingPage = () => {
     const guestsParam = params.get("guests");
     const idParam = params.get("id");
     
-    // First try to find by ID
     if (idParam) {
       const foundById = allDestinations.find(d => d.id === Number(idParam));
       if (foundById) {
@@ -109,16 +115,13 @@ const BookingPage = () => {
         
         setSelectedDestination(formattedDestination);
       }
-    } 
-    // Then try by name and location
-    else if (destParam) {
+    } else if (destParam) {
       let displayDest = destParam;
       if (locationParam) {
         displayDest += `, ${locationParam}`;
       }
       setDestination(displayDest);
       
-      // Try to find in our destinations
       const foundByName = allDestinations.find(
         d => d.name.toLowerCase() === destParam.toLowerCase() || 
              d.name.toLowerCase().includes(destParam.toLowerCase())
@@ -144,12 +147,10 @@ const BookingPage = () => {
       setGuests(Number(guestsParam));
     }
     
-    // If any search parameter was provided, show search results
     if (destParam || idParam) {
       setHasSearched(true);
       setShowSearchResults(true);
       
-      // Filter destinations based on search params
       const filtered = allDestinations.filter(dest => {
         if (idParam && dest.id === Number(idParam)) return true;
         if (destParam && (
@@ -169,15 +170,18 @@ const BookingPage = () => {
         
         setSearchResults(formattedResults);
       } else {
-        // If no matches, show all popular destinations
         setSearchResults(popularDestinations);
       }
     }
   }, [location.search]);
   
+  useEffect(() => {
+    const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    setBookedDestinations(savedBookings);
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Filter destinations
     const filtered = destination ? 
       allDestinations.filter(dest => 
         `${dest.name}, ${dest.location}`.toLowerCase().includes(destination.toLowerCase())
@@ -209,7 +213,21 @@ const BookingPage = () => {
   const completeBooking = () => {
     setIsBookingComplete(true);
     
-    // Reset after showing success for 2 seconds
+    const newBooking = {
+      id: Date.now(),
+      title: selectedDestination?.name || "Unknown Destination",
+      image: selectedDestination?.image || "",
+      date: date ? format(date, "dd-MM yyyy") : format(new Date(), "dd-MM yyyy"),
+      guests: guests,
+      price: selectedDestination?.price || 0,
+      destination: selectedDestination?.name || "Unknown Destination",
+    };
+    
+    const updatedBookings = [...bookedDestinations, newBooking];
+    setBookedDestinations(updatedBookings);
+    
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+    
     setTimeout(() => {
       setShowBookingModal(false);
       setIsBookingComplete(false);
@@ -330,9 +348,35 @@ const BookingPage = () => {
             />
           </div>
         )}
+        
+        {bookedDestinations.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 animate-fade-in">
+            <h2 className="text-xl font-bold mb-4 dark:text-white">Your Bookings</h2>
+            <Table>
+              <TableCaption>A list of your recent bookings.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Destination</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Guests</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bookedDestinations.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-medium">{booking.title}</TableCell>
+                    <TableCell>{booking.date}</TableCell>
+                    <TableCell>{booking.guests || 1}</TableCell>
+                    <TableCell className="text-right">{formatPrice(booking.price * (booking.guests || 1))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
       
-      {/* Booking Modal */}
       <Dialog open={showBookingModal} onOpenChange={setShowBookingModal}>
         <DialogContent className="sm:max-w-[500px] dark:bg-gray-800">
           <DialogHeader>
