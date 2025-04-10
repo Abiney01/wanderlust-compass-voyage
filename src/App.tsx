@@ -9,6 +9,7 @@ import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 
 import HomePage from "./pages/HomePage";
 import BookingPage from "./pages/BookingPage";
+import MyTripsPage from "./pages/MyTripsPage";
 import ExplorePage from "./pages/ExplorePage";
 import DestinationDetailPage from "./pages/DestinationDetailPage";
 import MessagePage from "./pages/MessagePage";
@@ -30,6 +31,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/booking" element={<BookingPage />} />
+              <Route path="/mytrips" element={<MyTripsPage />} />
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/explore/destinations/:id" element={<DestinationDetailPage />} />
               <Route path="/message" element={<MessagePage />} />

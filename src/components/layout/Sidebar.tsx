@@ -7,7 +7,8 @@ import {
   MessageSquare, 
   HelpCircle, 
   Settings, 
-  LogOut 
+  LogOut,
+  Route
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 const navItems = [
   { name: "Home", path: "/", icon: Home },
   { name: "Booking", path: "/booking", icon: BookOpen },
+  { name: "My Trips", path: "/mytrips", icon: Route },
   { name: "Explore", path: "/explore", icon: Compass },
   { name: "Message", path: "/message", icon: MessageSquare },
   { name: "Support", path: "/support", icon: HelpCircle },

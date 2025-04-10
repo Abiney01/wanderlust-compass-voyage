@@ -3,10 +3,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/Dashboard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Search, MapPin, Users, CreditCard, CheckCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Search, MapPin, Users, CreditCard, CheckCircle, Calendar, AlertCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, isAfter, isBefore } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TripCard } from "@/components/trips/TripCard";
 
 const popularDestinations = [
   {
@@ -92,7 +93,83 @@ const BookingPage = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [bookedDestinations, setBookedDestinations] = useState<any[]>([]);
+  const [completedTrips, setCompletedTrips] = useState<any[]>([]);
+  const [hasUpcomingTrips, setHasUpcomingTrips] = useState(true);
   
+  useEffect(() => {
+    const loadBookings = () => {
+      const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+      const today = new Date();
+      
+      const upcoming = savedBookings.filter((booking: any) => {
+        let tripDate: Date;
+        if (booking.date) {
+          const dateParts = booking.date.split(' ');
+          if (dateParts.length > 1) {
+            const dayRange = dateParts[0].split('-');
+            const endDay = dayRange.length > 1 ? parseInt(dayRange[1]) : parseInt(dayRange[0]);
+            const month = dateParts[1];
+            const year = dateParts[2] || new Date().getFullYear().toString();
+            tripDate = new Date(`${endDay} ${month} ${year}`);
+          } else {
+            const parts = booking.date.split('-');
+            if (parts.length === 3) {
+              tripDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            } else {
+              tripDate = new Date(booking.date);
+            }
+          }
+        } else {
+          tripDate = new Date();
+        }
+        
+        return isAfter(tripDate, today);
+      });
+      
+      const completed = savedBookings.filter((booking: any) => {
+        let tripDate: Date;
+        if (booking.date) {
+          const dateParts = booking.date.split(' ');
+          if (dateParts.length > 1) {
+            const dayRange = dateParts[0].split('-');
+            const endDay = dayRange.length > 1 ? parseInt(dayRange[1]) : parseInt(dayRange[0]);
+            const month = dateParts[1];
+            const year = dateParts[2] || new Date().getFullYear().toString();
+            tripDate = new Date(`${endDay} ${month} ${year}`);
+          } else {
+            const parts = booking.date.split('-');
+            if (parts.length === 3) {
+              tripDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            } else {
+              tripDate = new Date(booking.date);
+            }
+          }
+        } else {
+          tripDate = new Date();
+        }
+        
+        return isBefore(tripDate, today);
+      });
+      
+      upcoming.sort((a: any, b: any) => b.id - a.id);
+      completed.sort((a: any, b: any) => b.id - a.id);
+      
+      setHasUpcomingTrips(upcoming.length > 0);
+      setBookedDestinations(upcoming.slice(0, 3));
+      setCompletedTrips(completed.slice(0, 3));
+    };
+    
+    loadBookings();
+    
+    window.addEventListener('storage', loadBookings);
+    window.addEventListener('bookingUpdated', loadBookings);
+    
+    return () => {
+      window.removeEventListener('storage', loadBookings);
+      window.removeEventListener('bookingUpdated', loadBookings);
+    };
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const destParam = params.get("destination");
@@ -175,13 +252,6 @@ const BookingPage = () => {
     }
   }, [location.search]);
   
-  useEffect(() => {
-    const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    const sortedBookings = [...savedBookings].sort((a, b) => b.id - a.id);
-    const recentBookings = sortedBookings.slice(0, 3);
-    setBookedDestinations(recentBookings);
-  }, []);
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const filtered = destination ? 
@@ -219,6 +289,7 @@ const BookingPage = () => {
       id: Date.now(),
       title: selectedDestination?.name || "Unknown Destination",
       image: selectedDestination?.image || "",
+      fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
       date: date ? format(date, "dd-MM yyyy") : format(new Date(), "dd-MM yyyy"),
       guests: guests,
       price: selectedDestination?.price || 0,
@@ -382,6 +453,45 @@ const BookingPage = () => {
                 ))}
               </TableBody>
             </Table>
+          </div>
+        )}
+        
+        {!hasUpcomingTrips && completedTrips.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 animate-fade-in">
+            <div className="flex items-center mb-4">
+              <AlertCircle className="mr-2 text-amber-500" size={20} />
+              <h2 className="text-xl font-bold dark:text-white">No Upcoming Trips</h2>
+            </div>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">
+              You don't have any upcoming trips. Here are some of your recent completed trips:
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {completedTrips.map((trip) => (
+                <div key={trip.id} className="relative">
+                  <TripCard
+                    image={trip.image}
+                    fallbackImage={trip.fallbackImage || "https://images.unsplash.com/photo-1566073771259-6a8506099945"}
+                    title={trip.title}
+                    date={trip.date}
+                  />
+                  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    Completed
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 flex justify-center">
+              <Button 
+                onClick={() => navigate("/mytrips")}
+                variant="outline" 
+                className="flex items-center gap-2"
+              >
+                <Calendar size={16} />
+                View All My Trips
+              </Button>
+            </div>
           </div>
         )}
       </div>

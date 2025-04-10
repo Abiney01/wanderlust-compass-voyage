@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { SearchSuggestions } from "@/components/search/SearchSuggestions";
 import { useNavigate } from "react-router-dom";
 import { useUserPreferences } from "@/context/UserPreferencesContext";
+import { isAfter, isBefore, parseISO } from "date-fns";
 
 const popularRooms = [
   {
@@ -97,16 +98,86 @@ const HomePage = () => {
     const loadBookings = () => {
       const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
       if (savedBookings.length > 0) {
-        const bookingTrips = savedBookings.map((booking: any) => ({
-          id: booking.id || Date.now() + Math.random(),
-          image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-          fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-          title: booking.title || booking.destination || "New Booking",
-          date: booking.date || new Date().toLocaleDateString()
-        }));
+        const today = new Date();
         
-        bookingTrips.sort((a: any, b: any) => b.id - a.id);
-        setScheduledTrips(bookingTrips.slice(0, 3));
+        const upcomingBookings = savedBookings.filter((booking: any) => {
+          let tripDate: Date;
+          if (booking.date) {
+            const dateParts = booking.date.split(' ');
+            if (dateParts.length > 1) {
+              const dayRange = dateParts[0].split('-');
+              const endDay = dayRange.length > 1 ? parseInt(dayRange[1]) : parseInt(dayRange[0]);
+              const month = dateParts[1];
+              const year = dateParts[2] || new Date().getFullYear().toString();
+              tripDate = new Date(`${endDay} ${month} ${year}`);
+            } else {
+              const parts = booking.date.split('-');
+              if (parts.length === 3) {
+                tripDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+              } else {
+                tripDate = new Date(booking.date);
+              }
+            }
+          } else {
+            tripDate = new Date();
+          }
+          
+          return isAfter(tripDate, today);
+        });
+        
+        if (upcomingBookings.length > 0) {
+          const bookingTrips = upcomingBookings.map((booking: any) => ({
+            id: booking.id || Date.now() + Math.random(),
+            image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+            fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+            title: booking.title || booking.destination || "New Booking",
+            date: booking.date || new Date().toLocaleDateString()
+          }));
+          
+          bookingTrips.sort((a: any, b: any) => b.id - a.id);
+          setScheduledTrips(bookingTrips.slice(0, 3));
+        } else {
+          const completedBookings = savedBookings.filter((booking: any) => {
+            let tripDate: Date;
+            if (booking.date) {
+              const dateParts = booking.date.split(' ');
+              if (dateParts.length > 1) {
+                const dayRange = dateParts[0].split('-');
+                const endDay = dayRange.length > 1 ? parseInt(dayRange[1]) : parseInt(dayRange[0]);
+                const month = dateParts[1];
+                const year = dateParts[2] || new Date().getFullYear().toString();
+                tripDate = new Date(`${endDay} ${month} ${year}`);
+              } else {
+                const parts = booking.date.split('-');
+                if (parts.length === 3) {
+                  tripDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                } else {
+                  tripDate = new Date(booking.date);
+                }
+              }
+            } else {
+              tripDate = new Date();
+            }
+            
+            return isBefore(tripDate, today);
+          });
+          
+          if (completedBookings.length > 0) {
+            const completedTrips = completedBookings.map((booking: any) => ({
+              id: booking.id || Date.now() + Math.random(),
+              image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+              fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+              title: booking.title || booking.destination || "New Booking",
+              date: booking.date || new Date().toLocaleDateString(),
+              completed: true
+            }));
+            
+            completedTrips.sort((a: any, b: any) => b.id - a.id);
+            setScheduledTrips(completedTrips.slice(0, 3));
+          } else {
+            setScheduledTrips(defaultTrips);
+          }
+        }
       } else {
         setScheduledTrips(defaultTrips);
       }
@@ -127,16 +198,45 @@ const HomePage = () => {
     const checkForBookingUpdates = () => {
       const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
       if (savedBookings.length > 0) {
-        const bookingTrips = savedBookings.map((booking: any) => ({
-          id: booking.id || Date.now() + Math.random(),
-          image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-          fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
-          title: booking.title || booking.destination || "New Booking",
-          date: booking.date || new Date().toLocaleDateString()
-        }));
+        const today = new Date();
         
-        bookingTrips.sort((a: any, b: any) => b.id - a.id);
-        setScheduledTrips(bookingTrips.slice(0, 3));
+        const upcomingBookings = savedBookings.filter((booking: any) => {
+          let tripDate: Date;
+          if (booking.date) {
+            const dateParts = booking.date.split(' ');
+            if (dateParts.length > 1) {
+              const dayRange = dateParts[0].split('-');
+              const endDay = dayRange.length > 1 ? parseInt(dayRange[1]) : parseInt(dayRange[0]);
+              const month = dateParts[1];
+              const year = dateParts[2] || new Date().getFullYear().toString();
+              tripDate = new Date(`${endDay} ${month} ${year}`);
+            } else {
+              const parts = booking.date.split('-');
+              if (parts.length === 3) {
+                tripDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+              } else {
+                tripDate = new Date(booking.date);
+              }
+            }
+          } else {
+            tripDate = new Date();
+          }
+          
+          return isAfter(tripDate, today);
+        });
+        
+        if (upcomingBookings.length > 0) {
+          const bookingTrips = upcomingBookings.map((booking: any) => ({
+            id: booking.id || Date.now() + Math.random(),
+            image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+            fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+            title: booking.title || booking.destination || "New Booking",
+            date: booking.date || new Date().toLocaleDateString()
+          }));
+          
+          bookingTrips.sort((a: any, b: any) => b.id - a.id);
+          setScheduledTrips(bookingTrips.slice(0, 3));
+        }
       }
     };
     
@@ -227,13 +327,20 @@ const HomePage = () => {
           <div className="space-y-3">
             {scheduledTrips.length > 0 ? (
               scheduledTrips.map(trip => (
-                <TripCard
-                  key={trip.id}
-                  image={trip.image}
-                  fallbackImage={trip.fallbackImage}
-                  title={trip.title}
-                  date={trip.date}
-                />
+                <div key={trip.id} className="relative">
+                  <TripCard
+                    key={trip.id}
+                    image={trip.image}
+                    fallbackImage={trip.fallbackImage}
+                    title={trip.title}
+                    date={trip.date}
+                  />
+                  {trip.completed && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      Completed
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
               <div className="text-center py-4 text-gray-500 dark:text-gray-400">
@@ -241,6 +348,18 @@ const HomePage = () => {
               </div>
             )}
           </div>
+          {scheduledTrips.length > 0 && (
+            <div className="mt-4 text-center">
+              <Button 
+                onClick={() => navigate("/mytrips")}
+                variant="outline" 
+                size="sm"
+                className="text-xs"
+              >
+                View All My Trips
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
