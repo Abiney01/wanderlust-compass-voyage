@@ -34,6 +34,12 @@ const SignInPage = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [passwordResetSent, setPasswordResetSent] = useState(false);
   
+  // Reset password form state
+  const [resetFormOpen, setResetFormOpen] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -115,106 +121,66 @@ const SignInPage = () => {
       return;
     }
     
-    // In a real app, we would send an email here
-    // For now, just show a success message
-    setPasswordResetSent(true);
-    
     // Generate a reset token
     const resetToken = Math.random().toString(36).substring(2, 15);
+    setResetToken(resetToken);
     
     // Save the reset token to the user object
     user.resetToken = resetToken;
     localStorage.setItem("users", JSON.stringify(users));
     
+    // Show success message
+    setPasswordResetSent(true);
+    
     // In a real app, we would send an email with a link containing the reset token
     // For this demo, we'll simulate sending an email by logging to console
     console.log(`Password reset link for ${forgotPasswordEmail}: /reset-password?token=${resetToken}&email=${encodeURIComponent(forgotPasswordEmail)}`);
     
-    // After 3 seconds, close the dialog and reset state
+    // After 3 seconds, close the dialog and reset state, then open reset form
     setTimeout(() => {
       setForgotPasswordOpen(false);
       setPasswordResetSent(false);
-      setForgotPasswordEmail("");
       
-      // Show a reset link dialog for demonstration purposes
-      const resetUrl = `/reset-password?token=${resetToken}&email=${encodeURIComponent(forgotPasswordEmail)}`;
-      toast.info(
-        <div>
-          <p>For demo purposes, use this link to reset your password:</p>
-          <button 
-            className="text-blue-500 underline"
-            onClick={() => {
-              // Create temporary password reset page in memory
-              const resetForm = document.createElement("div");
-              resetForm.innerHTML = `
-                <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 class="text-xl font-bold mb-4 dark:text-white">Reset Password</h2>
-                    <div class="space-y-4">
-                      <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-white">New Password</label>
-                        <input type="password" id="new-pwd" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" />
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-white">Confirm New Password</label>
-                        <input type="password" id="confirm-pwd" class="w-full border rounded p-2 dark:bg-gray-700 dark:text-white" />
-                      </div>
-                      <div class="flex justify-end space-x-2 mt-4">
-                        <button id="cancel-reset" class="px-4 py-2 border rounded">Cancel</button>
-                        <button id="submit-reset" class="px-4 py-2 bg-blue-500 text-white rounded">Reset Password</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              `;
-              document.body.appendChild(resetForm);
-              
-              // Add event listeners
-              document.getElementById("cancel-reset")?.addEventListener("click", () => {
-                document.body.removeChild(resetForm);
-              });
-              
-              document.getElementById("submit-reset")?.addEventListener("click", () => {
-                const newPassword = (document.getElementById("new-pwd") as HTMLInputElement)?.value;
-                const confirmPassword = (document.getElementById("confirm-pwd") as HTMLInputElement)?.value;
-                
-                if (!newPassword || !confirmPassword) {
-                  toast.error("Please fill in all fields");
-                  return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                  toast.error("Passwords do not match");
-                  return;
-                }
-                
-                // Update user's password
-                const users = JSON.parse(localStorage.getItem("users") || "[]");
-                const userIndex = users.findIndex((u: any) => u.email === forgotPasswordEmail && u.resetToken === resetToken);
-                
-                if (userIndex === -1) {
-                  toast.error("Invalid or expired reset link");
-                  return;
-                }
-                
-                users[userIndex].password = newPassword;
-                users[userIndex].resetToken = null; // Clear the reset token
-                localStorage.setItem("users", JSON.stringify(users));
-                
-                toast.success("Password has been reset successfully!");
-                document.body.removeChild(resetForm);
-                
-                // Redirect to login
-                setActiveTab("signin");
-              });
-            }}
-          >
-            Click to reset password
-          </button>
-        </div>,
-        { duration: 10000 }
-      );
+      // Automatically open the reset password form
+      setResetFormOpen(true);
     }, 3000);
+  };
+  
+  const handleResetPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newPassword || !confirmNewPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    // Update user's password
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const userIndex = users.findIndex((u: any) => u.email === forgotPasswordEmail && u.resetToken === resetToken);
+    
+    if (userIndex === -1) {
+      toast.error("Invalid or expired reset link");
+      return;
+    }
+    
+    users[userIndex].password = newPassword;
+    users[userIndex].resetToken = null; // Clear the reset token
+    localStorage.setItem("users", JSON.stringify(users));
+    
+    toast.success("Password has been reset successfully!");
+    setResetFormOpen(false);
+    
+    // Clear form fields
+    setNewPassword("");
+    setConfirmNewPassword("");
+    
+    // Redirect to login
+    setActiveTab("signin");
   };
 
   return (
@@ -434,6 +400,62 @@ const SignInPage = () => {
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Reset Password Form Dialog */}
+      <Dialog open={resetFormOpen} onOpenChange={setResetFormOpen}>
+        <DialogContent className="bg-gray-900 text-white border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">Reset Your Password</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Please enter your new password below.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleResetPassword} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password" className="text-white">New Password</Label>
+              <Input 
+                id="new-password"
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm-new-password" className="text-white">Confirm New Password</Label>
+              <Input 
+                id="confirm-new-password"
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                required
+              />
+            </div>
+            
+            <DialogFooter className="mt-4">
+              <Button 
+                variant="ghost" 
+                type="button"
+                onClick={() => setResetFormOpen(false)}
+                className="text-gray-400 hover:text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Reset Password
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

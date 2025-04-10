@@ -90,11 +90,53 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { userName, formatPrice, translate, initializeTranslations } = useUserPreferences();
   const [translationsReady, setTranslationsReady] = useState(false);
+  const [scheduledTrips, setScheduledTrips] = useState([
+    {
+      id: 1,
+      image: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?auto=format&fit=crop&w=600&h=350",
+      fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+      title: "Aling Waterfall",
+      date: "01-04 July 2022"
+    },
+    {
+      id: 2,
+      image: "https://images.unsplash.com/photo-1601581875039-e899893d520c?auto=format&fit=crop&w=600&h=350",
+      fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+      title: "Prager Wildsee",
+      date: "12-19 July 2022"
+    },
+    {
+      id: 3,
+      image: "https://images.unsplash.com/photo-1502636621341-4846e29a3496?auto=format&fit=crop&w=600&h=350",
+      fallbackImage: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=600&h=350",
+      title: "Grouste Vista",
+      date: "07-12 August 2022"
+    }
+  ]);
 
   useEffect(() => {
     // Initialize translations when component mounts
     initializeTranslations();
     setTranslationsReady(true);
+    
+    // Load saved bookings from localStorage
+    const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    if (savedBookings.length > 0) {
+      // Combine with default trips or replace them based on your preference
+      setScheduledTrips(prevTrips => {
+        // Convert saved bookings to the format expected by TripCard
+        const bookingTrips = savedBookings.map((booking: any) => ({
+          id: booking.id || Date.now() + Math.random(),
+          image: booking.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+          fallbackImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&h=350",
+          title: booking.title || booking.destination || "New Booking",
+          date: booking.date || new Date().toLocaleDateString()
+        }));
+        
+        // Return a mix of existing and new bookings
+        return [...bookingTrips, ...prevTrips].slice(0, 5); // Keep only 5 most recent
+      });
+    }
   }, [initializeTranslations]);
 
   const handleSearch = (query: string) => {
