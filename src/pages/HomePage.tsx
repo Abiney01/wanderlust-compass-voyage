@@ -105,7 +105,10 @@ const HomePage = () => {
           date: booking.date || new Date().toLocaleDateString()
         }));
         
-        setScheduledTrips([...bookingTrips, ...defaultTrips].slice(0, 5));
+        bookingTrips.sort((a: any, b: any) => b.id - a.id);
+        setScheduledTrips(bookingTrips.slice(0, 3));
+      } else {
+        setScheduledTrips(defaultTrips);
       }
     };
 
@@ -132,7 +135,8 @@ const HomePage = () => {
           date: booking.date || new Date().toLocaleDateString()
         }));
         
-        setScheduledTrips([...bookingTrips, ...defaultTrips].slice(0, 5));
+        bookingTrips.sort((a: any, b: any) => b.id - a.id);
+        setScheduledTrips(bookingTrips.slice(0, 3));
       }
     };
     

@@ -177,7 +177,9 @@ const BookingPage = () => {
   
   useEffect(() => {
     const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    setBookedDestinations(savedBookings);
+    const sortedBookings = [...savedBookings].sort((a, b) => b.id - a.id);
+    const recentBookings = sortedBookings.slice(0, 3);
+    setBookedDestinations(recentBookings);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -223,10 +225,17 @@ const BookingPage = () => {
       destination: selectedDestination?.name || "Unknown Destination",
     };
     
-    const updatedBookings = [...bookedDestinations, newBooking];
-    setBookedDestinations(updatedBookings);
+    const savedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
     
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+    const allBookings = [newBooking, ...savedBookings];
+    const sortedBookings = allBookings.sort((a, b) => b.id - a.id);
+    const recentBookings = sortedBookings.slice(0, 3);
+    
+    setBookedDestinations(recentBookings);
+    localStorage.setItem("bookings", JSON.stringify(sortedBookings));
+    
+    window.dispatchEvent(new Event('bookingUpdated'));
+    window.dispatchEvent(new Event('storage'));
     
     setTimeout(() => {
       setShowBookingModal(false);
@@ -351,9 +360,9 @@ const BookingPage = () => {
         
         {bookedDestinations.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 animate-fade-in">
-            <h2 className="text-xl font-bold mb-4 dark:text-white">Your Bookings</h2>
+            <h2 className="text-xl font-bold mb-4 dark:text-white">Your Recent Bookings</h2>
             <Table>
-              <TableCaption>A list of your recent bookings.</TableCaption>
+              <TableCaption>Your 3 most recent bookings.</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead>Destination</TableHead>
